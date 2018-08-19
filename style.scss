@@ -1,0 +1,230 @@
+$zIndex: 2000;
+
+.hidden{
+    display: none !important;
+}
+
+.fixed{
+    position: fixed;
+}
+
+.nyg-fs-container{
+    z-index: $zIndex + 1;
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    width:100%;
+    justify-content: center;
+    align-items: center;
+    margin: auto;        
+}
+
+.nyg-carousel-outer{
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.nyg-carousel-inner{
+    display: flex;
+    flex-flow: row;
+    height: 100%;
+    width: 100%;
+
+    .btn-container{
+        flex: 0 1 auto;
+        position: absolute;
+        width: 4em;
+        //width: 100%;
+        height: 4em;
+        display: flex;
+        top: calc(50% - 2em);
+        //background-color: rbga(0,0,0,0.1)
+        background: rgba(0,0,0,0.3);
+        //opacity: 0.9;
+        border-radius: 20%;
+        z-index: 2;
+
+        &.left{
+            left: 0;
+            //background-image: linear-gradient(to right,rgba(0,0,0,.4) 0,rgba(0,0,0,.0001) 6em); //100%
+        }
+        
+        &.right{
+            right: 0;
+            //background-image: linear-gradient(to left,rgba(0,0,0,.4) 0,rgba(0,0,0,.0001) 6em); //100%
+        }
+
+        &:hover{
+            background: rgba(0,0,0,0.4);
+            //opacity: 0.4;
+            //background-color: #fff;
+        }
+    }
+
+    .item{
+        flex: 1 1 auto;
+        display: none;
+        height: 100%;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        
+        img{
+            //display: block;
+            margin: auto;
+            max-width: 100%;
+            max-height:100%;
+            width: auto;
+            height: auto;
+            position: absolute;
+            top: 0;  
+            bottom: 0;  
+            left: 0;  
+            right: 0;  
+            
+        }
+
+        &.active{
+            display: block;
+            //position: absolute;
+        }
+    }
+
+}
+
+body.nyg-prevent-scroll{
+    height: 100%;
+    overflow: hidden;
+}
+
+
+div.nyg-overlay{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    z-index: $zIndex;
+    background-color: #000000;
+
+    &.active{
+        display: flex;
+    }
+
+
+    .nyg-fs-menubar{
+        z-index: $zIndex + 2;
+        flex: 0 0 64px;
+        width: 100%;
+        display: flex;
+        flex-flow: row;
+    
+        .nyg-fs-menubar-title{
+            flex: 1 1 auto;
+
+            font-size: 40px;
+            line-height: 64px;
+            color: white;
+            padding: 0 0 0 15px;
+        }
+    
+        .nyg-fs-menubar-btn-group{
+            flex: 0 1 64px;
+
+            display: flex;
+            flex-direction: row;
+
+            .nyg-fs-menubar-btn{
+                cursor: pointer;
+
+                opacity: 0.5;
+
+                &:hover{
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+
+
+}
+
+.nyg-close {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    &:before, &:after{
+        position: absolute;
+        right: 50%;
+        top: 15px;
+        content: ' ';
+        height: 33px;
+        width: 2px;
+        background-color: #FFF;
+    }
+
+    &:before{
+        transform: rotate(45deg);
+    }
+    &:after{
+        transform: rotate(-45deg);
+    }
+  }
+
+.nyg-tiles{
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 -8px 0, -8px -8px 0, 8px -8px 0, 0 0 0 32px inset, -8px 0 0, 8px 0 0, 0 8px 0, -8px 8px 0, 8px 8px 0;
+    margin: 15px;
+}
+
+.chevron{
+    width: 100%;
+    height: 100%;
+    //opacity: 0.5;
+
+    &:hover{
+        opacity: 1;
+    }
+}
+
+.chevron::before {
+    padding: 5px;
+	border-style: solid;
+	border-width: 0.4em 0.4em 0 0;
+	content: '';
+	display: inline-block;
+	height: 1em;
+	//left: 0.15em;
+    position: absolute;
+	top: 0.15em;
+	transform: rotate(-45deg);
+	vertical-align: top;
+	width: 1em;
+    color: #fff;
+    //box-shadow: 0.1em -0.1em 0px 0px #000;
+}
+
+.chevron.right:before {
+    top:1em;
+	right: 1.5em;
+	transform: rotate(45deg);
+}
+
+.chevron.bottom:before {
+	top: 0;
+	transform: rotate(135deg);
+}
+
+.chevron.left:before {
+    top: 1em;
+	left: 1.5em;
+	transform: rotate(-135deg);
+}
