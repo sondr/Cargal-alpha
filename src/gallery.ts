@@ -1,9 +1,10 @@
 import { Fullscreen } from './module/fullscreen';
-import { _CLASSNAMES } from './constants';
-import { Config, Options, Find_Element } from './config';
+import { _CLASSNAMES, _EVENT_ACTIONS, _HTML } from './constants';
+import { Find_Element } from './config';
 import { Carousel } from './module/carousel';
 import { PLATFORM, _PLATFORM } from './platform';
 import { createElement } from './dom/utils';
+import { IGallery, Config } from './interfaces';
 
 export class Gallery {
 
@@ -24,24 +25,23 @@ export class Gallery {
             let container = domGals.item(i) as HTMLElement;
             let externalMedia: HTMLDivElement[] = [];
 
-            console.log(container.dataset);
             let opts = Object.assign({}, _PLATFORM.defaultOptions);
             if (container.id) {
                 opts.Id = container.id
-                externalMedia = externalImg.filter(e => e.dataset.nygInclude == opts.Id).map(e => {
+                externalMedia = externalImg.filter(e => e.dataset.cgInclude == opts.Id).map(e => {
                     let el = e.cloneNode(true);
-                    let wrapper = createElement('div', 'item') as HTMLDivElement;
+                    let wrapper = createElement(_HTML.Tags.div, _CLASSNAMES.item) as HTMLDivElement;
                     wrapper.appendChild(el);
                     
                     return wrapper;
                 });
             } else
-                opts.Id = `nyg-id-${i}`;
+                opts.Id = `cg-id-${i}`;
 
             this.galleries.push({
                 options: opts,
                 container: Find_Element(container, `.${_CLASSNAMES.carouselOuter}`)!,
-                media: Array.from(container.getElementsByClassName('item')) as HTMLDivElement[],
+                media: Array.from(container.getElementsByClassName(_CLASSNAMES.item)) as HTMLDivElement[],
                 externalMedia: externalMedia
             });
         }
@@ -61,27 +61,12 @@ export class Gallery {
         //gallery.container.addEventListener('click', (event) => gallery.Carousel!.togglePlay());
         //gallery.container.addEventListener('click', (event) => gallery.Fullscreen!.show(event));
 
-        gallery.media.forEach((img, index) => img.addEventListener('click', (event) => gallery.Fullscreen!.show(index)));
-        gallery.externalMedia.forEach((img, index) => img.addEventListener('click', (event) => gallery.Fullscreen!.show(imgCount + index)));
+        gallery.media.forEach((img, index) => img.addEventListener(_EVENT_ACTIONS.click, (event) => gallery.Fullscreen!.show(index)));
+        gallery.externalMedia.forEach((img, index) => img.addEventListener(_EVENT_ACTIONS.click, (event) => gallery.Fullscreen!.show(imgCount + index)));
     }
 
     private Detach_EventListeners(gallery: IGallery) {
         //gallery.container.removeEventListener('click', (event) => gallery.Carousel!.togglePlay());
     }
 
-}
-
-export interface IGallery {
-    options?: Options,
-    container: HTMLElement, 
-    media: HTMLDivElement[], 
-    externalMedia: HTMLDivElement[],
-    Carousel?: Carousel;
-    Fullscreen?: Fullscreen;
-}
-
-export interface IMedia{
-    type: string;
-    src: string;
-    srcXl: string;
 }

@@ -1,13 +1,13 @@
-import { nyGalleryElement, InyGalleryElement } from './../dom/utils';
+import { nyGalleryElement } from './../dom/utils';
 import { _PLATFORM } from './../platform';
-import { IGallery, IMedia } from './../gallery';
-import { _CLASSNAMES } from '../constants';
+import { _CLASSNAMES, _EVENT_ACTIONS } from '../constants';
 import { Thumbnails } from './thumbnails';
 import { Find_Element } from '../config';
+import { IGallery } from '../interfaces';
 
 export class Carousel {
-    private readonly gallery: IGallery;
-    private readonly thumbnails: Thumbnails;
+    public readonly gallery: IGallery;
+    private thumbnails?: Thumbnails;
     private running: boolean = false;
     private intervalTimer: any;
     private activeIndex?: number;
@@ -20,19 +20,34 @@ export class Carousel {
 
     constructor(gallery: IGallery) {
         this.gallery = gallery;
-        console.log(this.gallery);
         //this.outerElement = Find_Element(this.gallery.container, `.${_CLASSNAMES.carouselOuter}`) as HTMLDivElement;
-        console.log("CarouselOuter: ", this.gallery.container)
         this.innerElement = Find_Element(this.gallery.container, `.${_CLASSNAMES.carouselInner}`) as HTMLDivElement;
-        console.log(this.innerElement);
+
         this.buttons = this.appendButtons();
-        this.thumbnails = new Thumbnails(this.gallery);
+
 
         this.init();
+
+        if (this.gallery.options!.carousel!.thumbnails)
+            this.activateThumbnails();
+    }
+
+    public get getActiveIndex(): number {
+        return this.activeIndex!;
+    }
+
+    public activateThumbnails() {
+        if (!this.thumbnails) this.thumbnails = new Thumbnails(this);
     }
 
     private init() {
         if (this.gallery.media.length <= 0) return;
+
+        let innerElementChilds = Array.from(this.innerElement.children) as HTMLDivElement[];
+        this.gallery.media.forEach(item => {
+            if (!innerElementChilds.includes(item))
+                this.innerElement.appendChild(item);
+        });
 
         this.activeIndex = this.gallery.media.findIndex(image => image.classList.contains(_CLASSNAMES.active));
         if (this.activeIndex == -1)
@@ -47,16 +62,16 @@ export class Carousel {
             // LEFT CLICK
             new nyGalleryElement({
                 parentElement: this.innerElement,
-                classes: 'btn-container left',
-                eventListeners: [{ action: 'click', handler: e => { this.cycle(-1); if (this.running) this.stop(); } }],
-                children: [{ classes: 'left chevron' }]
+                classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.left}`,
+                eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(-1); if (this.running) this.stop(); } }],
+                children: [{ classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}` }]
             }),
             // RIGHT CLICK
             new nyGalleryElement({
                 parentElement: this.innerElement,
-                classes: 'btn-container right',
-                eventListeners: [{ action: 'click', handler: e => { this.cycle(1); if (this.running) this.stop(); } }],
-                children: [{ classes: 'right chevron' }]
+                classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.right}`,
+                eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(1); if (this.running) this.stop(); } }],
+                children: [{ classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.right}` }]
             })];
     }
 
@@ -99,6 +114,11 @@ export class Carousel {
         if (index >= this.gallery.media.length) return;
         if (this.activeIndex != undefined) this.set_inactive(this.activeIndex);
         this.gallery.media[index].classList.add(_CLASSNAMES.active);
+
+
+        if (this.thumbnails)
+            this.thumbnails.setActive(index, this.activeIndex);
+
         this.activeIndex = index;
     }
 
@@ -107,7 +127,7 @@ export class Carousel {
         this.restart();
     }
 
-    public dispose(){
+    public dispose() {
         this.buttons.forEach(btnElement => btnElement.dispose());
     }
 

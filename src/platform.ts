@@ -1,4 +1,4 @@
-import { Options } from './config';
+import { Options } from './interfaces';
 import { Overlay } from './dom/overlay';
 
 export let _PLATFORM: PLATFORM;
@@ -23,6 +23,6 @@ export class PLATFORM {
         this.defaultOptions = defaultOptions;
         this.variables = {};
         _PLATFORM = this;
-        this.overlay = Overlay.create();
+        this.overlay = new Overlay();
     }
 }

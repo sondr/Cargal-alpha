@@ -1,7 +1,6 @@
-import { Options } from './../config';
 import { Carousel } from './carousel';
 import { _PLATFORM } from './../platform';
-import { IGallery } from "../gallery";
+import { IGallery, Options } from '../interfaces';
 
 export class Fullscreen {
     private readonly containerElement: HTMLElement;
@@ -15,12 +14,11 @@ export class Fullscreen {
         this.images = this.gallery.media.concat(this.gallery.externalMedia).map(node => node.cloneNode(true) as HTMLDivElement);
         this.containerElement = _PLATFORM.overlay.initiateFullscreen();
 
-        this.images.forEach(img => this.containerElement.appendChild(img))
-
         let opts = JSON.parse(JSON.stringify(this.gallery.options!)) as Options;
         opts.carousel = opts.fullscreen;
         // opts.carousel!.Events = {};
         // opts.fullscreen!.Events = {};
+
         this.carousel = new Carousel(<IGallery>{
             media: this.images,
             container: this.containerElement,

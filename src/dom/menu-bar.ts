@@ -1,14 +1,10 @@
-import { _CLASSNAMES } from './../constants';
+import { _CLASSNAMES, _EVENT_ACTIONS } from './../constants';
 import { _PLATFORM } from './../platform';
 import { nyGalleryElement } from './utils';
 
 export class MenuBar {
     private readonly container: HTMLElement;
     private readonly nyGalleryElementContainer: nyGalleryElement;
-
-    static create(container: HTMLElement) {
-        return new MenuBar(container);
-    }
 
     constructor(container: HTMLElement) {
         this.container = container;
@@ -35,7 +31,7 @@ export class MenuBar {
                         // BUTTONS:
                         {
                             classes: `${_CLASSNAMES.fullscreenMenuBarBtn} ${_CLASSNAMES.iconClose}`, eventListeners: [{
-                                action: 'click', handler: (event) => { _PLATFORM.overlay.close() }
+                                action: _EVENT_ACTIONS.click, handler: (event) => { _PLATFORM.overlay.close() }
                             }]
                         }
                     ]

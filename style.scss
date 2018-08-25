@@ -8,7 +8,7 @@ $zIndex: 2000;
     position: fixed;
 }
 
-.nyg-fs-container{
+.cg-fs-container{
     z-index: $zIndex + 1;
     flex: 1 1 auto;
     display: flex;
@@ -20,19 +20,110 @@ $zIndex: 2000;
     margin: auto;        
 }
 
-.nyg-carousel-outer{
+.cg-carousel-outer{
     position: relative;
     height: 100%;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .cg-thumb-container{
+        display: none;
+        flex: 0 0 100px;
+        flex-direction: row;
+        height: 100%;
+        //background: #020202;
+
+        ul{
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            max-height: 100px; // variable
+            width: 100%;
+            white-space:nowrap;
+            overflow: scroll hidden;
+            
+            text-align: center; // should be variable
+        
+
+            li{
+                height: calc(100% - 12px);
+                display: inline-block;
+                margin: 10px 5px 0 5px;
+                border:solid transparent 1px;
+                //filter: grayscale(0);
+                
+                &.active{
+                    //border-top: solid #fff 1px;
+                    border:solid #666 1px;
+                    //filter: grayscale(10);
+                }
+
+                img{
+                    max-height: 100%;
+                    width: auto;
+                }
+            }
+        }
+
+        &.active{
+            display: flex;
+        }
+
+        // .item{
+        //     flex: 0 1 auto;
+        //     min-width: 0;
+        //     margin: 4px;
+
+        //     img{
+        //         max-height: 100%;
+        //         width: auto;
+        //         border: solid transparent 1px;
+        //         //filter: blur(2px);
+        //     }
+
+        //     &.active{
+        //         img{
+        //             border:solid #666 1px;
+        //             //filter: blur(0);
+        //         }
+        //     }
+        // }
+
+        .cg-btn-container{
+            flex: 0 1 auto;
+            position: relative;
+            width: 4em;
+            height: 4em;
+            display: flex;
+            top: calc(50% - 2em);
+            background: rgba(0,0,0,0.3);
+            border-radius: 20%;
+            z-index: 2;
+            cursor: pointer;
+    
+            &.left{
+                left: 0;
+            }
+            
+            &.right{
+                right: 0;
+            }
+    
+            &:hover{
+                background: rgba(0,0,0,0.4);
+            }
+        }
+    }
 }
 
-.nyg-carousel-inner{
+.cg-carousel-inner{
     display: flex;
     flex-flow: row;
     height: 100%;
     width: 100%;
 
-    .btn-container{
+    .cg-btn-container{
         flex: 0 1 auto;
         position: absolute;
         width: 4em;
@@ -45,21 +136,18 @@ $zIndex: 2000;
         //opacity: 0.9;
         border-radius: 20%;
         z-index: 2;
+        cursor: pointer;
 
         &.left{
             left: 0;
-            //background-image: linear-gradient(to right,rgba(0,0,0,.4) 0,rgba(0,0,0,.0001) 6em); //100%
         }
         
         &.right{
             right: 0;
-            //background-image: linear-gradient(to left,rgba(0,0,0,.4) 0,rgba(0,0,0,.0001) 6em); //100%
         }
 
         &:hover{
             background: rgba(0,0,0,0.4);
-            //opacity: 0.4;
-            //background-color: #fff;
         }
     }
 
@@ -95,13 +183,13 @@ $zIndex: 2000;
 
 }
 
-body.nyg-prevent-scroll{
+body.cg-prevent-scroll{
     height: 100%;
     overflow: hidden;
 }
 
 
-div.nyg-overlay{
+div.cg-overlay{
     position: fixed;
     top: 0;
     bottom: 0;
@@ -110,21 +198,21 @@ div.nyg-overlay{
     display: none;
     flex-direction: column;
     z-index: $zIndex;
-    background-color: #000000;
+    background-color: #000; // VARIABLE
 
     &.active{
         display: flex;
     }
 
 
-    .nyg-fs-menubar{
+    .cg-fs-menubar{
         z-index: $zIndex + 2;
         flex: 0 0 64px;
         width: 100%;
         display: flex;
         flex-flow: row;
     
-        .nyg-fs-menubar-title{
+        .cg-fs-menubar-title{
             flex: 1 1 auto;
 
             font-size: 40px;
@@ -133,13 +221,13 @@ div.nyg-overlay{
             padding: 0 0 0 15px;
         }
     
-        .nyg-fs-menubar-btn-group{
+        .cg-fs-menubar-btn-group{
             flex: 0 1 64px;
 
             display: flex;
             flex-direction: row;
 
-            .nyg-fs-menubar-btn{
+            .cg-fs-menubar-btn{
                 cursor: pointer;
 
                 opacity: 0.5;
@@ -155,7 +243,7 @@ div.nyg-overlay{
 
 }
 
-.nyg-close {
+.cg-close {
     position: relative;
     width: 100%;
     height: 100%;
@@ -178,7 +266,7 @@ div.nyg-overlay{
     }
   }
 
-.nyg-tiles{
+.cg-tiles{
     width: 4px;
     height: 4px;
     box-shadow: 0 -8px 0, -8px -8px 0, 8px -8px 0, 0 0 0 32px inset, -8px 0 0, 8px 0 0, 0 8px 0, -8px 8px 0, 8px 8px 0;

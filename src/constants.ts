@@ -1,46 +1,7 @@
-export interface IClassNames {
-    active: string;
-    hidden: string;
-    fixed: string;
-
-    btnContainer: string;
-
-
-    carouselContainer: string; //'ny-gallery-container'
-    carouselOuter: string;
-    carouselInner: string;
-
-    thumbnailContainer: string;
-    thumbnailItem: string;
-
-    overlay: string;
-
-    fullscreenContainer: string;
-    fullscreenGallery: string;
-
-    fullscreenMenuBar: string;
-    fullscreenMenuBarTitle: string;
-    fullscreenMenuBarBtnGroup: string;
-    fullscreenMenuBarBtn: string;
-
-    externalIncludeImage: string;
-
-
-    preventScroll: string;
-
-    iconClose: string;
-    chevron: string;
-
-    left: string;
-    right: string;
-    up: string;
-    down: string;
-
-    [key: string]: string | undefined;
-}
+import { IClassNames } from "./interfaces";
 
 function Prepare_Classnames(): IClassNames {
-    const classPrepender: string = 'nyg-';
+    const classPrepender: string = 'cg-';
 
 
     let classnames: IClassNames = {
@@ -76,10 +37,13 @@ function Prepare_Classnames(): IClassNames {
         left: 'left',
         right: 'right',
         up: 'up',
-        down: 'down'
+        down: 'down',
+
+        item: 'item'
     };
 
-    const keyExcludePrepend: string[] = [classnames.active, classnames.hidden, classnames.fixed, classnames.chevron, classnames.left, classnames.right, classnames.up, classnames.down];
+    const keyExcludePrepend: string[] = [classnames.active, classnames.hidden, classnames.fixed, classnames.chevron, 
+        classnames.left, classnames.right, classnames.up, classnames.down, classnames.item];
 
     Object.keys(classnames!).forEach((key, index) => {
         if (keyExcludePrepend.includes(key)) return;
@@ -90,3 +54,20 @@ function Prepare_Classnames(): IClassNames {
 }
 
 export const _CLASSNAMES: IClassNames = Prepare_Classnames();
+
+export const _HTML = {
+    Tags:{
+        div: 'div',
+        img: 'img'
+    },
+    Attr:{
+        src: 'src',
+        srcSet: 'srcset'
+    }
+};
+
+export const _EVENT_ACTIONS = {
+    click: 'click',
+    touchmove: 'touchmove',
+    DOMContentLoaded: 'DOMContentLoaded'
+};

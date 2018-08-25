@@ -1,6 +1,5 @@
-import { CarouselOptions, fullscreenOptions } from './config';
 import { ready } from './browser/document';
-import { IGallery } from './gallery';
+import { Config, fullscreenOptions, CarouselOptions } from './interfaces';
 
 export async function Configure(userConfig?: Config): Promise<Config> {
     let [carouselOptions, fullscreenOptions] = [<CarouselOptions>{
@@ -9,7 +8,7 @@ export async function Configure(userConfig?: Config): Promise<Config> {
         backgroundColor: '#FFFFFF',
         opacity: undefined,
         slideInterval: 10000,
-        thumbnails: false,
+        thumbnails: true,
         Events: undefined,
     }, <fullscreenOptions>{
         menuBarFixed: true,
@@ -51,10 +50,9 @@ export async function Configure(userConfig?: Config): Promise<Config> {
 export function Find_Element(DOM: Document | HTMLElement, query: string) {
     let element: HTMLElement | null = null;
     query = query.trim();
-    console.log(element, query);
     try {
         if (query.split(" ").length == 1)
-            switch (query) {
+            switch (query.substr(0,1)) {
                 case '#':
                     element = (<Document>DOM).getElementById ? (<Document>DOM).getElementById(query.substr(1)) : DOM.querySelector(query);
                     break;
@@ -62,7 +60,7 @@ export function Find_Element(DOM: Document | HTMLElement, query: string) {
                     element = DOM.getElementsByClassName(query.substr(1)).item(0) as HTMLElement;
                     break;
                 default:
-                    element = DOM.getElementsByTagName(query.substr(1)).item(0) as HTMLElement;
+                    element = DOM.getElementsByTagName(query).item(0) as HTMLElement;
                     break;
             }
         else
@@ -71,77 +69,4 @@ export function Find_Element(DOM: Document | HTMLElement, query: string) {
     } catch (err) { console.log(err); }
 
     return element;
-}
-
-
-export interface Config {
-    document?: Document | any;
-    window?: Window | any;
-    autoInitCarousels?: boolean;
-    rootElement?: HTMLElement | string | null,
-    containerElement?: HTMLElement[] | HTMLElement | string[] | string | null,
-    //media?: HTMLElement[] | HTMLElement | Media | Media[];
-    options?: Options
-
-    Events?: ConfigEvents;
-}
-
-export interface ConfigEvents{
-    onLoaded: () => IGallery;
-}
-
-export interface Options {
-    Id?: string;
-
-    //autoInitiate?: boolean;
-
-    // autoplay?: boolean;
-    // autoplay_repeat?: boolean;
-    // slideInterval?: number;
-    lazyLoad?: boolean;
-
-    //thumbnails?: boolean;
-
-    carousel?: CarouselOptions;
-    fullscreen?: fullscreenOptions;
-}
-
-export interface Media {
-    type: string;
-    src: string;
-    srcset: string;
-}
-
-export interface CarouselOptions {
-    autoplay?: boolean;
-    autoplay_repeat?: boolean;
-    slideInterval?: number;
-
-    thumbnails?: boolean;
-
-    backgroundColor?: string;
-
-    btnColor?: string;
-    btnBackgroundColor: string;
-
-    opacity?: number;
-
-    Events?: CarouselEvents;
-}
-
-export interface fullscreenOptions extends CarouselOptions {
-    menuBarFixed?: boolean;
-    Events?: FullscreenEvents;
-}
-
-export interface CarouselEvents {
-    onEnd?: any;
-    onChange?: any;
-    onStop?: any;
-    onStart?: any;
-}
-
-export interface FullscreenEvents extends CarouselEvents {
-    onShow?: any;
-    onClose?: any;
 }

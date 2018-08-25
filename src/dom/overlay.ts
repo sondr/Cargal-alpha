@@ -1,14 +1,9 @@
 import { MenuBar } from './menu-bar';
 import { _PLATFORM } from './../platform';
-import { _CLASSNAMES } from '../constants';
-import { createElement } from './utils';
+import { _CLASSNAMES, _HTML, _EVENT_ACTIONS } from '../constants';
+import { createElement  } from './utils';
 
 export class Overlay {
-    static create(): Overlay {
-        return new Overlay();
-    }
-
-
     private fullScreenElements: HTMLElement[] = [];
     private element: HTMLDivElement;
     private fullscreenContainerElement: HTMLElement;
@@ -17,18 +12,18 @@ export class Overlay {
     private activeFullscreenElementIndex?: number;
 
     constructor() {
-        this.fullscreenContainerElement = _PLATFORM.DOM.createElement('div');
+        this.fullscreenContainerElement = _PLATFORM.DOM.createElement(_HTML.Tags.div);
         this.fullscreenContainerElement.className = _CLASSNAMES.fullscreenContainer;
 
-        this.element = this.create_element();
-        this.menubar = MenuBar.create(this.element);
+        this.element = createElement(_HTML.Tags.div, _CLASSNAMES.overlay) as HTMLDivElement;
+        this.menubar = new MenuBar(this.element);
 
         this.append_overlay();
     }
 
     public initiateFullscreen() {
-        let element = createElement('div', `${_CLASSNAMES.carouselOuter}`);
-        element.appendChild(createElement('div', `${_CLASSNAMES.carouselInner}`))
+        let element = createElement(_HTML.Tags.div, _CLASSNAMES.carouselOuter);
+        element.appendChild(createElement(_HTML.Tags.div, _CLASSNAMES.carouselInner));
 
         this.fullScreenElements.push(element);
 
@@ -69,13 +64,6 @@ export class Overlay {
         this.remove_overlay();
     }
 
-    private create_element() {
-        let element = document.createElement('div') as HTMLDivElement;
-        element.className = _CLASSNAMES.overlay;
-
-        return element;
-    }
-
     private remove_childs() {
         while (this.element.firstChild)
             this.element.removeChild(this.element.firstChild);
@@ -92,12 +80,12 @@ export class Overlay {
 
     private prevent_scroll() {
         _PLATFORM.DOM.body.classList.add(_CLASSNAMES.preventScroll);
-        _PLATFORM.global.addEventListener('touchmove', e => e.preventDefault);
+        _PLATFORM.global.addEventListener(_EVENT_ACTIONS.touchmove, e => e.preventDefault);
     }
 
     private allow_scroll() {
         _PLATFORM.DOM.body.classList.remove(_CLASSNAMES.preventScroll);
-        _PLATFORM.global.removeEventListener('touchmove', e => e.preventDefault);
+        _PLATFORM.global.removeEventListener(_EVENT_ACTIONS.touchmove, e => e.preventDefault);
     }
 
 }

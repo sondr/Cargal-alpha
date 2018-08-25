@@ -1,29 +1,38 @@
 import { _PLATFORM } from './../platform';
+import { _HTML } from '../constants';
+import { InyGalleryElement } from '../interfaces';
 
-export function createElement(elementTag: string, classes: string, textContent?:string) {
+export function createElement(elementTag: string, classes: string, textContent?: string, attr?: string[][]) {
     let element = _PLATFORM.DOM.createElement(elementTag);
     if (classes) element.className = classes;
-    if(textContent) element.textContent = textContent;
+    if (textContent) element.textContent = textContent;
+    if (attr && Array.isArray(attr)) attr.forEach(a => (<any>element)[a[0]] = a[1]);
 
     return element;
 }
 
 
 export class nyGalleryElement {
-    public readonly parentElement: HTMLElement;
+    public parentElement: HTMLElement;
     public readonly element: HTMLElement;
     public readonly children?: nyGalleryElement[];
     public readonly options: InyGalleryElement;
 
-    constructor(opts: InyGalleryElement) {
-        if (!opts.tagName) opts.tagName = 'div';
-        this.parentElement = opts.parentElement!;
-        this.options = opts;
-        this.element = createElement(opts.tagName, opts.classes!, this.options.textContent);
+    constructor(opts?: InyGalleryElement) {
+        if (!opts!.tagName) opts!.tagName = _HTML.Tags.div;
+        this.parentElement = opts!.parentElement!;
+        this.options = opts!;
+        this.element = createElement(opts!.tagName!, opts!.classes!, this.options.textContent, this.options.attr);
 
-        this.children = this.mapChildren(opts.children!);
+        this.children = this.mapChildren(opts!.children!);
 
         this.init();
+    }
+
+    public setParent(parent: HTMLElement){
+        if(!parent) return;
+        this.parentElement = parent;
+        if(parent) parent.appendChild(this.element);
     }
 
     private init() {
@@ -32,16 +41,19 @@ export class nyGalleryElement {
                 this.element.addEventListener(el.action, el.handler));
         }
 
-        if (this.parentElement) this.parentElement.appendChild(this.element);
+        this.setParent(this.parentElement);
     }
 
-    private mapChildren(children: (nyGalleryElement | InyGalleryElement)[]) {
+    private mapChildren(children: (nyGalleryElement | InyGalleryElement | undefined)[]) {
         if (!children || !Array.isArray(children)) return [];
 
         return children.map(child => {
-            if (child instanceof nyGalleryElement) return <nyGalleryElement>child;
+            if (child instanceof nyGalleryElement){ 
+                if(!child.parentElement) child.setParent(this.element);
+                return <nyGalleryElement>child;
+            }
 
-            child.parentElement = this.element;
+            child!.parentElement = this.element;
             let c = new nyGalleryElement(<InyGalleryElement>child);
             return c;
         });
@@ -66,18 +78,4 @@ export class nyGalleryElement {
         if (this.parentElement) this.parentElement.removeChild(this.element);
     }
 
-}
-
-export interface InyGalleryElement {
-    parentElement?: HTMLElement;
-    tagName?: string;
-    textContent?: string;
-    classes?: string;
-    children?: (nyGalleryElement | InyGalleryElement)[];
-    eventListeners?: InyGalleryEventListener[];
-}
-
-interface InyGalleryEventListener {
-    action: string;
-    handler: EventListenerOrEventListenerObject;
 }
