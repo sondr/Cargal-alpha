@@ -29,8 +29,13 @@ export interface Config {
     //media?: HTMLElement[] | HTMLElement | Media | Media[];
     defaultOptions?: Options;
 
-    instances?: { container: HTMLElement | string, options: Options }[];
+    instances?: GalleryInstance[];
     Events?: ConfigEvents;
+}
+
+export interface GalleryInstance {
+    container?: HTMLElement | string | null;
+    options: Options;
 }
 
 export interface ConfigEvents {
@@ -102,7 +107,7 @@ export interface IGallery {
     Fullscreen?: Fullscreen;
 }
 
-export interface IMedia{
+export interface IMedia {
     element: HTMLElement;
     type?: string;
     title: string;

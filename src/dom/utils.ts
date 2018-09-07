@@ -37,7 +37,7 @@ export class nyGalleryElement {
         this.options = opts!;
         this.element = createElement(opts!.element || opts!.tagName!, opts!.classes!, this.options.textContent, this.options.attr);
         //if (!opts!.element)
-         opts!.element = this.element;
+        opts!.element = this.element;
 
         this.children = this.mapChildren(opts!.children!);
 

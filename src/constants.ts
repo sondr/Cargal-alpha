@@ -71,3 +71,19 @@ export const _EVENT_ACTIONS = {
     touchMove: 'touchmove',
     DOMContentLoaded: 'DOMContentLoaded'
 };
+
+export const _DATA_SETS = {
+    externalInclude: 'cgInclude',
+    carousel:{
+        color: 'cgCarouselColor',
+        backgroundColor: 'cgCarouselBackgroundColor',
+    },
+    fullscreen:{
+        color: 'cgGalleryColor',
+        backgroundColor: 'cgGalleryBackgroundColor',
+    },
+    item:{
+        title: 'cgTitle',
+        description: 'cgDescription',    
+    }
+};
