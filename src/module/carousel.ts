@@ -1,78 +1,132 @@
-import { nyGalleryElement } from './../dom/utils';
+import { Fullscreen } from './fullscreen';
+import { nyGalleryElement, Find_Element } from './../dom/utils';
 import { _PLATFORM } from './../platform';
-import { _CLASSNAMES, _EVENT_ACTIONS } from '../constants';
+import { _CLASSNAMES, _EVENT_ACTIONS, _HTML } from './../constants';
 import { Thumbnails } from './thumbnails';
-import { Find_Element } from '../config';
-import { IGallery } from '../interfaces';
+import { IGallery, InyGalleryElement } from '../interfaces';
 
 export class Carousel {
+    public readonly fullScreen: Fullscreen;
     public readonly gallery: IGallery;
     private thumbnails?: Thumbnails;
     private running: boolean = false;
     private intervalTimer: any;
     private activeIndex?: number;
+    private element?: nyGalleryElement;
 
-    //private outerElement: HTMLDivElement;
-    private innerElement: HTMLDivElement;
+    private buttonContainer?: InyGalleryElement;
 
-
-    private buttons: nyGalleryElement[];
-
-    constructor(gallery: IGallery) {
+    constructor(gallery: IGallery, fullScreen?: Fullscreen) {
+        this.fullScreen = fullScreen!;
         this.gallery = gallery;
-        //this.outerElement = Find_Element(this.gallery.container, `.${_CLASSNAMES.carouselOuter}`) as HTMLDivElement;
-        this.innerElement = Find_Element(this.gallery.container, `.${_CLASSNAMES.carouselInner}`) as HTMLDivElement;
-
-        this.buttons = this.appendButtons();
-
-
         this.init();
 
         if (this.gallery.options!.carousel!.thumbnails)
             this.activateThumbnails();
     }
 
+    public get Element() {
+        return this.element;
+    }
+
+    public get Thumbnails() {
+        this.activateThumbnails();
+        return this.thumbnails;
+    }
+
     public get getActiveIndex(): number {
         return this.activeIndex!;
     }
 
-    public activateThumbnails() {
+    private activateThumbnails() {
         if (!this.thumbnails) this.thumbnails = new Thumbnails(this);
     }
 
     private init() {
+        let carouselElement = this.gallery.container.classList.contains(_CLASSNAMES.carousel) ?
+            this.gallery.container : Find_Element(this.gallery.container, `.${_CLASSNAMES.carousel}`); // or create one
+
+        let listelement = carouselElement ? Find_Element(carouselElement, _HTML.Tags.ul) : undefined;
+
+        let lastTouchStartEvent: TouchEvent | null;
+
+        let container: InyGalleryElement = {
+            element: carouselElement!,
+            children: [
+                {
+                    element: listelement!, tagName: _HTML.Tags.ul,
+                    children: this.gallery.media.map(el => <InyGalleryElement>{
+                        element: el.element
+                    })
+                },
+                this.createButtons()
+            ],
+            eventListeners: [
+                {
+                    action: _EVENT_ACTIONS.touchStart, handler: event => { lastTouchStartEvent = <TouchEvent>event; }
+                },
+                {
+                    action: _EVENT_ACTIONS.touchEnd, handler: event => {
+                        const distance = lastTouchStartEvent!.changedTouches[0].pageX - (<TouchEvent>event).changedTouches[0].pageX;
+                        if (Math.abs(distance) > 75) this.cycle(distance > 0 ? 1 : -1);
+                        lastTouchStartEvent = null;
+                    }
+                }
+            ]
+        };
+
+        if (!this.fullScreen) {
+            container.eventListeners = container.eventListeners!.concat([{
+                action: _EVENT_ACTIONS.mouseEnter, handler: event => {
+                    event.stopPropagation();
+                    this.buttonContainer!.element!.classList.remove(_CLASSNAMES.hidden);
+                }
+            },
+            {
+                action: _EVENT_ACTIONS.mouseLeave, handler: event => {
+                    event.stopPropagation();
+                    this.buttonContainer!.element!.classList.add(_CLASSNAMES.hidden);
+                }
+            }]);
+        }
+
+        container = {
+            element: this.gallery.container, children: [container]
+        };
+
+        this.element = new nyGalleryElement(container);
+
         if (this.gallery.media.length <= 0) return;
 
-        let innerElementChilds = Array.from(this.innerElement.children) as HTMLDivElement[];
-        this.gallery.media.forEach(item => {
-            if (!innerElementChilds.includes(item))
-                this.innerElement.appendChild(item);
-        });
 
-        this.activeIndex = this.gallery.media.findIndex(image => image.classList.contains(_CLASSNAMES.active));
-        if (this.activeIndex == -1)
-            this.set_active(0);
+        this.activeIndex = this.gallery.media.findIndex(image => image.element.classList.contains(_CLASSNAMES.active));
+        //if (this.activeIndex == -1)
+        this.set_active(this.activeIndex == -1 ? 0 : this.activeIndex);
 
         if (this.gallery.options!.carousel!.autoplay)
             this.play();
     }
 
-    appendButtons() {
-        return [
-            // LEFT CLICK
-            new nyGalleryElement({
-                parentElement: this.innerElement,
-                classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.left}`,
-                eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(-1); if (this.running) this.stop(); } }],
-                children: [{ classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}` }]
-            }),
-            // RIGHT CLICK
-            new nyGalleryElement({
-                parentElement: this.innerElement,
-                classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.right}`,
-                eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(1); if (this.running) this.stop(); } }],
-                children: [{ classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.right}` }]
-            })];
+    createButtons() {
+        this.buttonContainer = {
+            //classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.hidden}`,
+            classes: `${_CLASSNAMES.btnContainer}`,
+            children: [
+                // LEFT CLICK
+                {
+                    classes: `${_CLASSNAMES.btn} ${_CLASSNAMES.left}`,
+                    eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(-1); } }],
+                    children: [{ classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}` }]
+                },
+                // RIGHT CLICK
+                {
+                    classes: `${_CLASSNAMES.btn} ${_CLASSNAMES.right}`,
+                    eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(1); } }],
+                    children: [{ classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.right}` }]
+                }]
+        }
+
+        return this.buttonContainer;
     }
 
     public togglePlay() {
@@ -88,7 +142,7 @@ export class Carousel {
             if (!this.gallery.options!.carousel!.autoplay_repeat && this.activeIndex! == this.gallery.media.length - 1)
                 _PLATFORM.global.clearInterval(this.intervalTimer);
 
-            this.cycle(1);
+            this.cycle(1, true);
         }, this.gallery.options!.carousel!.slideInterval!);
 
         this.running = true;
@@ -99,7 +153,7 @@ export class Carousel {
         this.running = false;
     }
 
-    public cycle(count: number) {
+    public cycle(count: number, continuePlay?: boolean) {
         if (this.gallery.media.length <= 0) return;
 
         count = count % this.gallery.media.length;
@@ -107,14 +161,18 @@ export class Carousel {
         if (index >= this.gallery.media.length) index -= this.gallery.media.length;
         if (index < 0) index += this.gallery.media.length;
 
-        this.set_active(index);
+        this.set_active(index, continuePlay);
     }
 
-    public set_active(index: number) {
+    public set_active(index: number, continuePlay?: boolean) {
+        if (!continuePlay && this.running) this.stop(); // stopping loop
+
         if (index >= this.gallery.media.length) return;
         if (this.activeIndex != undefined) this.set_inactive(this.activeIndex);
-        this.gallery.media[index].classList.add(_CLASSNAMES.active);
+        this.gallery.media[index].element.classList.add(_CLASSNAMES.active);
 
+        if (this.fullScreen)
+            this.fullScreen.setMediaInfo(this.gallery.media[index], index + 1, this.gallery.media.length);
 
         if (this.thumbnails)
             this.thumbnails.setActive(index, this.activeIndex);
@@ -128,7 +186,9 @@ export class Carousel {
     }
 
     public dispose() {
-        this.buttons.forEach(btnElement => btnElement.dispose());
+        //this.buttons.forEach(btnElement => btnElement.dispose());
+        if (this.element)
+            this.element.dispose();
     }
 
     private restart() {
@@ -138,10 +198,10 @@ export class Carousel {
 
     private set_inactive(index: number) {
         if (index >= this.gallery.media.length || index < 0) return;
-        this.gallery.media[index].classList.remove(_CLASSNAMES.active);
+        this.gallery.media[index].element.classList.remove(_CLASSNAMES.active);
     }
 
     private set_all_inactive() {
-        this.gallery.media.forEach(img => img.classList.remove(_CLASSNAMES.active));
+        this.gallery.media.forEach(img => img.element.classList.remove(_CLASSNAMES.active));
     }
 }

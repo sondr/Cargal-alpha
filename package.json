@@ -1,5 +1,5 @@
 {
-  "name": "NotYet_TS_Lib_Template",
+  "name": "CarGal",
   "version": "0.2.0",
   "description": "",
   "main": "index.js",
@@ -52,6 +52,7 @@
     "webpack-dev-server": "3.1.5"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.3.1",
     "core-js": "^2.5.7"
   }
 }

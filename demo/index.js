@@ -1,3 +1,3 @@
 
 
-window.ntGallery.init({  });
+window.CarGal.init({  });

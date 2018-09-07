@@ -24,7 +24,7 @@ function configure(env: any, args: any): webpack.Configuration {
 
   let config: webpack.Configuration = {
     entry: { 
-      ntGallery: [
+      CarGal: [
         //'core-js',
         path.resolve(srcDir, 'index.ts')
       ],

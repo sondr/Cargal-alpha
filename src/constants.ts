@@ -1,64 +1,50 @@
-import { IClassNames } from "./interfaces";
+export const _CLASSNAMES = {
+    active: 'active',
+    hidden: 'cg-hidden',
+    fixed: 'fixed',
 
-function Prepare_Classnames(): IClassNames {
-    const classPrepender: string = 'cg-';
+    btnContainer: 'cg-btn-container',
+    btn: 'cg-btn',
 
+    carouselContainer: 'cg-container',
+    carousel: 'cg-carousel',
 
-    let classnames: IClassNames = {
-        active: 'active',
-        hidden: 'hidden',
-        fixed: 'fixed',
+    thumbnailContainer: 'cg-thumbs',
+    thumbsActive: 'cg-thumbs-active',
 
-        btnContainer: 'btn-container',
+    overlay: 'cg-overlay',
 
-        carouselContainer: 'container',
-        carouselOuter: 'carousel-outer',
-        carouselInner: 'carousel-inner',
+    fullscreenContainer: 'cg-fs-container',
+    fullscreenGallery: 'cg-fs-gallery',
+    fullscreenMenuBar: 'cg-fs-menubar',
+    fullscreenMenuBarTitle: 'cg-fs-menubar-title',
+    fullscreenMenuBarBtnGroup: 'cg-fs-menubar-btn-group',
+    fullscreenMenuBarBtn: 'cg-fs-menubar-btn',
 
-        thumbnailContainer: 'thumb-container',
-        thumbnailItem: 'thumb-item',
+    externalIncludeImage: 'cg-external-include',
 
-        overlay: 'overlay',
+    preventScroll: 'cg-prevent-scroll',
 
-        fullscreenContainer: 'fs-container',
-        fullscreenGallery: 'fs-gallery',
-        fullscreenMenuBar: 'fs-menubar',
-        fullscreenMenuBarTitle: 'fs-menubar-title',
-        fullscreenMenuBarBtnGroup: 'fs-menubar-btn-group',
-        fullscreenMenuBarBtn: 'fs-menubar-btn',
+    iconThumbnails: 'cg-thumbnails',
+    iconTiles: 'cg-tiles',
+    iconClose: 'cg-close',
+    chevron: 'cg-chevron',
 
-        externalIncludeImage: 'external-include',
+    left: 'cg-left',
+    right: 'cg-right',
+    up: 'cg-up',
+    down: 'cg-down',
 
-        preventScroll: 'prevent-scroll',
-
-        iconClose: 'close',
-        chevron: 'chevron',
-
-        left: 'left',
-        right: 'right',
-        up: 'up',
-        down: 'down',
-
-        item: 'item'
-    };
-
-    const keyExcludePrepend: string[] = [classnames.active, classnames.hidden, classnames.fixed, classnames.chevron, 
-        classnames.left, classnames.right, classnames.up, classnames.down, classnames.item];
-
-    Object.keys(classnames!).forEach((key, index) => {
-        if (keyExcludePrepend.includes(key)) return;
-        classnames![key] = `${classPrepender}${classnames![key]}`;
-    });
-    console.log("prepared classnames", classnames);
-    return classnames;
-}
-
-export const _CLASSNAMES: IClassNames = Prepare_Classnames();
+    item: 'cg-item'
+};
 
 export const _HTML = {
     Tags:{
         div: 'div',
-        img: 'img'
+        img: 'img',
+        ul: 'ul',
+        li: 'li',
+        i: 'i'
     },
     Attr:{
         src: 'src',
@@ -66,8 +52,22 @@ export const _HTML = {
     }
 };
 
+export const _TYPES = {
+    boolean: 'boolean',
+    number: 'number'
+}
+
 export const _EVENT_ACTIONS = {
     click: 'click',
-    touchmove: 'touchmove',
+    mouseDown: 'mousedown',
+    mouseUp: 'mouseup',
+    mouseMove: 'mousemove',
+    mouseOver: 'mouseover',
+    mouseOut: 'mouseout',
+    mouseEnter: 'mouseenter',
+    mouseLeave: 'mouseleave',
+    touchStart: 'touchstart',
+    touchEnd: 'touchend',
+    touchMove: 'touchmove',
     DOMContentLoaded: 'DOMContentLoaded'
 };

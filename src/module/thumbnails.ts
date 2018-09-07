@@ -1,68 +1,91 @@
-import { _CLASSNAMES, _EVENT_ACTIONS, _HTML } from './../constants';
+import { _CLASSNAMES, _EVENT_ACTIONS, _HTML, _TYPES } from './../constants';
 import { _PLATFORM } from './../platform';
-import { nyGalleryElement } from '../dom/utils';
-import { Find_Element } from '../config';
+import { nyGalleryElement,Find_Element } from '../dom/utils';
 import { Carousel } from './carousel';
 import { InyGalleryElement } from '../interfaces';
 
 export class Thumbnails {
+    private active: boolean;
     private carousel: Carousel;
 
     private model: nyGalleryElement;
     private thumbnailList?: nyGalleryElement;
 
     constructor(carousel: Carousel) {
+        this.active = !!carousel.gallery.options!.carousel!.thumbnails!;
         this.carousel = carousel;
         this.model = this.init();
     }
 
+    public get isActive(){
+        return this.active;
+    }
+
     public show() {
-        this.model.element.classList.add(_CLASSNAMES.active);
+        this.model.Element.classList.add(_CLASSNAMES.active);
+        this.active = true;
     }
 
     public hide() {
-        this.model.element.classList.remove(_CLASSNAMES.active);
+        this.model.Element.classList.remove(_CLASSNAMES.active);
+        this.active = false;
     }
 
     public toggle() {
-        this.model.element.classList.toggle(_CLASSNAMES.active);
+        if(this.active) this.hide();
+        else this.show();
+        //this.model.Element.classList.toggle(_CLASSNAMES.active);
     }
 
     init() {
+
         return new nyGalleryElement({
-            parentElement: this.carousel.gallery.container,
+            parentElement: this.carousel.Element!.Element,
             classes: `${_CLASSNAMES.thumbnailContainer} ${this.carousel.gallery.options!.carousel!.thumbnails ? _CLASSNAMES.active : ''}`, children: [
-                {
-                    classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.left}`, children: [
-                        { classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}` }
-                    ]
-                },
+                // {
+                //     classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.left}`, children: [
+                //         { classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}` }
+                //     ]
+                // },
                 this.create_thumbnails(),
-                {
-                    classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.right}`, children: [
-                        { classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.right}` }
-                    ]
-                }
+                // {
+                //     classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.right}`, children: [
+                //         { classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.right}` }
+                //     ]
+                // }
             ]
         });
     }
 
     setActive(index: number, lastActiveIndex?: number) {
-        if (typeof lastActiveIndex === 'number')
-            this.thumbnailList!.children![lastActiveIndex].element.classList.remove(_CLASSNAMES.active);
-        if (typeof index === 'number')
-            this.thumbnailList!.children![index].element.classList.add(_CLASSNAMES.active);
+        if (typeof lastActiveIndex === _TYPES.number)
+            this.thumbnailList!.children![lastActiveIndex!].Element.classList.remove(_CLASSNAMES.active);
+        if (typeof index === _TYPES.number)
+            this.thumbnailList!.children![index].Element.classList.add(_CLASSNAMES.active);
     }
 
     create_thumbnails(): nyGalleryElement {
-        let thumbnailList: InyGalleryElement = { tagName: 'ul', children: [] };
+        let thumbnailList: InyGalleryElement = { tagName: _HTML.Tags.ul,
+            eventListeners: [
+                { action: _EVENT_ACTIONS.mouseDown, handler: e => { 
+                    e.preventDefault();
+                    console.log('mousedown', thumbnailList.element, e); } 
+                },
+                { action: _EVENT_ACTIONS.mouseUp, handler: e => { console.log('mouseup', thumbnailList.element, e); } },
+                { action: _EVENT_ACTIONS.touchStart, handler: e => { 
+                    thumbnailList.element!.style.overflowX = 'auto';
+                    console.log('touchmove', thumbnailList.element, e); 
+            } }
+            ],
+            children: []
+        };
 
         this.carousel.gallery.media.forEach((item, index) => {
-            let imgEl = Find_Element(item, _HTML.Tags.img) as HTMLImageElement;
+            let imgEl = Find_Element(item.element, _HTML.Tags.img) as HTMLImageElement;
             if (!imgEl) return;
 
             thumbnailList.children!.push({
-                tagName: 'li',
+                tagName: _HTML.Tags.li,
                 classes: _CLASSNAMES.item, children: [{
                     tagName: _HTML.Tags.img, attr: [
                         [_HTML.Attr.src, imgEl.src],

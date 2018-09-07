@@ -3,6 +3,8 @@ import { Fullscreen } from "./module/fullscreen";
 import { nyGalleryElement } from "./dom/utils";
 
 export interface InyGalleryElement {
+    //get ele?: HTMLElement;
+    element?: HTMLElement;
     parentElement?: HTMLElement;
     tagName?: string;
     textContent?: string;
@@ -14,28 +16,30 @@ export interface InyGalleryElement {
 
 export interface InyGalleryEventListener {
     action: string;
-    handler: EventListenerOrEventListenerObject;
+    handler: (event: UIEvent) => void;
 }
 
 export interface Config {
     document?: Document | any;
     window?: Window | any;
-    autoInitCarousels?: boolean;
     rootElement?: HTMLElement | string | null,
+    autoInit?: boolean;
+    //enableFullScreen?: boolean;
     containerElement?: HTMLElement[] | HTMLElement | string[] | string | null,
     //media?: HTMLElement[] | HTMLElement | Media | Media[];
-    options?: Options
+    defaultOptions?: Options;
 
+    instances?: { container: HTMLElement | string, options: Options }[];
     Events?: ConfigEvents;
 }
 
-export interface ConfigEvents{
+export interface ConfigEvents {
     onLoaded: () => IGallery;
 }
 
 export interface Options {
     Id?: string;
-
+    enableFullScreen: boolean;
     //autoInitiate?: boolean;
 
     // autoplay?: boolean;
@@ -65,7 +69,7 @@ export interface CarouselOptions {
     backgroundColor?: string;
 
     btnColor?: string;
-    btnBackgroundColor: string;
+    btnBackgroundColor?: string;
 
     opacity?: number;
 
@@ -89,60 +93,24 @@ export interface FullscreenEvents extends CarouselEvents {
     onClose?: any;
 }
 
-export interface IClassNames {
-    active: string;
-    hidden: string;
-    fixed: string;
-
-    btnContainer: string;
-
-
-    carouselContainer: string; //'ny-gallery-container'
-    carouselOuter: string;
-    carouselInner: string;
-
-    thumbnailContainer: string;
-    thumbnailItem: string;
-
-    overlay: string;
-
-    fullscreenContainer: string;
-    fullscreenGallery: string;
-
-    fullscreenMenuBar: string;
-    fullscreenMenuBarTitle: string;
-    fullscreenMenuBarBtnGroup: string;
-    fullscreenMenuBarBtn: string;
-
-    externalIncludeImage: string;
-
-
-    preventScroll: string;
-
-    iconClose: string;
-    chevron: string;
-
-    left: string;
-    right: string;
-    up: string;
-    down: string;
-
-    item: string;
-
-    [key: string]: string | undefined;
-}
-
 export interface IGallery {
     options?: Options,
-    container: HTMLElement, 
-    media: HTMLDivElement[], 
-    externalMedia: HTMLDivElement[],
+    container: HTMLElement,
+    media: IMedia[],
+    externalMedia: IMedia[],
     Carousel?: Carousel;
     Fullscreen?: Fullscreen;
 }
 
 export interface IMedia{
-    type: string;
-    src: string;
-    srcXl: string;
+    element: HTMLElement;
+    type?: string;
+    title: string;
+    description: string;
 }
+
+// export interface IMedia {
+//     type: string;
+//     src: string;
+//     srcXl: string;
+// }
