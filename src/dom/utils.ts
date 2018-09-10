@@ -1,3 +1,4 @@
+import { _DATA_SETS } from './../constants';
 import { IMedia } from './../interfaces';
 import { _PLATFORM } from './../platform';
 import { _HTML } from '../constants';
@@ -12,16 +13,19 @@ export function createElement(elementTagOrElement: string | HTMLElement, classes
     return element;
 }
 
-export function convertToMediaObjects(elements: HTMLElement[]): IMedia[] {
+export function convertToMediaObjects(elements: (HTMLElement | HTMLElement[])[]): IMedia[] {
     return elements.map(convertToMediaObject);
 }
 
-export function convertToMediaObject(element: HTMLElement) {
-    console.log("Dataset: ", element.dataset);
+export function convertToMediaObject(element: HTMLElement | HTMLElement[]) {
+    const origin = Array.isArray(element) ? (<HTMLElement[]>element)[1] : undefined;
+    const e = origin ? (<HTMLElement[]>element)[0] : <HTMLElement>element;
+    //console.log("Dataset: ", element.dataset);
     return <IMedia>{
-        element: element,
-        title: element.dataset.cgTitle,
-        description: element.dataset.cgDescription
+        origin: origin,
+        element: e,
+        title: origin ? origin.dataset[_DATA_SETS.item.title] : e.dataset[_DATA_SETS.item.title],
+        description: origin ? origin.dataset[_DATA_SETS.item.description] : e.dataset[_DATA_SETS.item.description]
     };
 }
 
@@ -121,3 +125,30 @@ export function Find_Element(DOM: Document | HTMLElement, query: string) {
 
     return element;
 }
+
+
+export const deepObjectAssign = <T extends object = object>(target: T, ...sources: T[]): T => {
+    if (!sources.length) return target;
+    const source = sources.shift();
+    if (source === undefined) return target;
+
+    if (isMergebleObject(target) && isMergebleObject(source)) {
+        Object.keys(source).forEach((key: string) => {
+            if (isMergebleObject((<any>source)[key])) {
+                if (!(<any>target)[key]) (<any>target)[key] = {};
+                deepObjectAssign((<any>target)[key], (<any>source)[key]);
+            } else
+                (<any>target)[key] = (<any>source)[key];
+        });
+    }
+
+    return deepObjectAssign(target, ...sources);
+};
+
+export function isObject(item: any): boolean {
+    return item !== null && typeof item === 'object';
+};
+
+export function isMergebleObject(item: any): boolean {
+    return isObject(item) && !Array.isArray(item);
+};

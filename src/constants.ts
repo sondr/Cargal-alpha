@@ -9,6 +9,10 @@ export const _CLASSNAMES = {
     carouselContainer: 'cg-container',
     carousel: 'cg-carousel',
 
+    caption: 'cg-caption',
+    title: 'cg-title',
+    description: 'cg-description',
+
     thumbnailContainer: 'cg-thumbs',
     thumbsActive: 'cg-thumbs-active',
 
@@ -54,7 +58,8 @@ export const _HTML = {
 
 export const _TYPES = {
     boolean: 'boolean',
-    number: 'number'
+    number: 'number',
+    string: 'string'
 }
 
 export const _EVENT_ACTIONS = {
@@ -73,7 +78,6 @@ export const _EVENT_ACTIONS = {
 };
 
 export const _DATA_SETS = {
-    externalInclude: 'cgInclude',
     carousel:{
         color: 'cgCarouselColor',
         backgroundColor: 'cgCarouselBackgroundColor',
@@ -84,6 +88,11 @@ export const _DATA_SETS = {
     },
     item:{
         title: 'cgTitle',
-        description: 'cgDescription',    
+        description: 'cgDescription',
+        url: 'cgCaptionUrl'
+    },
+    external:{
+        include: 'cgGalleryId',
+        removeFromDOM: 'cgRemove'
     }
 };

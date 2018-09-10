@@ -34,8 +34,10 @@ export interface Config {
 }
 
 export interface GalleryInstance {
+    ContainerId?: string;
     container?: HTMLElement | string | null;
     options: Options;
+    externalMedia?: HTMLElement[];
 }
 
 export interface ConfigEvents {
@@ -44,7 +46,7 @@ export interface ConfigEvents {
 
 export interface Options {
     Id?: string;
-    enableFullScreen: boolean;
+    enableFullScreen?: boolean;
     //autoInitiate?: boolean;
 
     // autoplay?: boolean;
@@ -99,15 +101,18 @@ export interface FullscreenEvents extends CarouselEvents {
 }
 
 export interface IGallery {
-    options?: Options,
-    container: HTMLElement,
-    media: IMedia[],
-    externalMedia: IMedia[],
+    Id: number;
+    options?: Options;
+    containerId?: string;
+    container: HTMLElement;
+    media: IMedia[];
+    externalMedia: IMedia[];
     Carousel?: Carousel;
     Fullscreen?: Fullscreen;
 }
 
 export interface IMedia {
+    origin?: HTMLElement;
     element: HTMLElement;
     type?: string;
     title: string;

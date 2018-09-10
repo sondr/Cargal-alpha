@@ -1,3 +1,3 @@
 
 
-window.CarGal.init({  });
+window.CarGal.init();
