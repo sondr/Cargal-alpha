@@ -12,6 +12,7 @@ export function Configure(userConfig?: Config): Config {
         slideInterval: 10000,
         thumbnails: true,
         Events: undefined,
+        btns: {}
     }, <fullscreenOptions>{
         menuBarFixed: true,
         opacity: 0.95,
@@ -22,6 +23,7 @@ export function Configure(userConfig?: Config): Config {
         slideInterval: 10000,
         thumbnails: true,
         Events: undefined,
+        btns: {}
     }];
 
     // let configEvents: ConfigEvents = {

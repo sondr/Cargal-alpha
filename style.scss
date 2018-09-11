@@ -220,15 +220,15 @@ div.cg-overlay {
     display: block;
     width: 40px;
     height: 40px; //100%;
-    background-color: #{$fullScreenTextColor};
+    //background-color: #{$fullScreenTextColor};
     &:before,
     &:after {
+        background-color: #{$fullScreenTextColor};
         position: absolute;
         right: 50%; //top: 15px;
         content: ' ';
         height: 33px;
         width: 2px;
-        background-color: inherit;
     }
     &:before {
         transform: rotate(45deg);
@@ -267,41 +267,44 @@ div.cg-overlay {
 .cg-chevron {
     width: 100%;
     height: 100%; //opacity: 0.5;
+
     &:hover {
         opacity: 1;
     }
-}
 
-.cg-chevron::before {
-    padding: 5px;
-    border-style: solid;
-    border-width: 0.4em 0.4em 0 0;
-    content: '';
-    display: inline-block;
-    height: 1em; //left: 0.15em;
-    position: absolute;
-    top: 0.15em;
-    transform: rotate(-45deg);
-    vertical-align: top;
-    width: 1em;
-    color: #fff; //box-shadow: 0.1em -0.1em 0px 0px #000;
-}
+    &::before {
+        padding: 5px;
+        border-style: solid;
+        border-width: 0.2em 0.2em 0 0;
+        content: '';
+        display: inline-block;
+        height: 0.5em; //left: 0.15em;
+        position: absolute;
+        top: 0.15em;
+        transform: rotate(-45deg);
+        vertical-align: top;
+        width: 0.5em;
+        color: #fff; //box-shadow: 0.1em -0.1em 0px 0px #000;
+    }
 
-.cg-chevron.cg-right:before {
-    top: 1em;
-    right: 1.5em;
-    transform: rotate(45deg);
-}
+    &.cg-right:before, &.cg-left:before{
+        top: 1.25em;
+    }
 
-.cg-chevron.cg-bottom:before {
-    top: 0;
-    transform: rotate(135deg);
-}
+    &.cg-right:before{
+        right: 1.5em;
+        transform: rotate(45deg);
+    }
 
-.cg-chevron.cg-left:before {
-    top: 1em;
-    left: 1.5em;
-    transform: rotate(-135deg);
+    &.cg-left:before{
+        left: 1.5em;
+        transform: rotate(-135deg);
+    }
+
+    &.cg-bottom:before {
+        top: 0;
+        transform: rotate(135deg);
+    }
 }
 
 .cg-hidden {

@@ -97,7 +97,7 @@ export class Fullscreen {
                         {
                             tagName: _HTML.Tags.li, classes: _CLASSNAMES.fullscreenMenuBarBtn, eventListeners: [{
                                 action: _EVENT_ACTIONS.click, handler: (event) => { this.setThumbnailsActiveState(); }
-                            }], styles: this.options.fullscreen!.btnBackgroundColor ? { values: [['color', this.options.fullscreen!.btnBackgroundColor!]] } : undefined,
+                            }], styles: this.options.fullscreen!.btns!.background ? { values: [['color', this.options.fullscreen!.btns!.background!]] } : undefined,
                             children: [{
                                 tagName: _HTML.Tags.i, classes: _CLASSNAMES.iconThumbnails,
                                 styles: this.options.fullscreen!.color ? {

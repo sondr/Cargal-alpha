@@ -119,11 +119,11 @@ export class Carousel {
                     eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(-1); } }],
                     children: [{
                         tagName: _HTML.Tags.i, classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}`,
-                        styles: this.gallery.options!.carousel!.btnColor ? {
+                        styles: this.gallery.options!.carousel!.btns!.color ? {
                             childValues: [{
                                 id: ':before',
                                 values: [
-                                    ['color', this.gallery.options!.carousel!.btnColor]
+                                    ['color', this.gallery.options!.carousel!.btns!.color]
                                 ]
                             }]
                         } : undefined
@@ -135,11 +135,11 @@ export class Carousel {
                     eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(1); } }],
                     children: [{
                         tagName: _HTML.Tags.i, classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.right}`,
-                        styles: this.gallery.options!.carousel!.btnColor ? {
+                        styles: this.gallery.options!.carousel!.btns!.color ? {
                             childValues: [{
                                 id: ':before',
                                 values: [
-                                    ['color', this.gallery.options!.carousel!.btnColor]
+                                    ['color', this.gallery.options!.carousel!.btns!.color]
                                 ]
                             }]
                         } : undefined

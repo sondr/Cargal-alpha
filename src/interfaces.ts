@@ -101,12 +101,22 @@ export interface CarouselOptions {
     backgroundColor?: string;
     color?: string;
 
-    btnColor?: string;
-    btnBackgroundColor?: string;
+    btns?: btnOptions;
+    // btnColor?: string;
+    // btnColorHover?: string;
+    // btnBackground?: string;
+    // btnBackgroundHover?: string;
 
     opacity?: number;
 
     Events?: CarouselEvents;
+}
+
+export interface btnOptions{
+    color?: string;
+    hover?: string;
+    background?: string;
+    backgroundHover?: string;
 }
 
 export interface fullscreenOptions extends CarouselOptions {

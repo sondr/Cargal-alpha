@@ -5,15 +5,17 @@ var testConfig = {
         container: '#test',
         options: {
             carousel: {
-                autoplay: false
+                autoplay: false,
+                btns: {
+                    color: '#ed1c24'
+                }
             },
             fullscreen: {
                 backgroundColor: '#fff',
-                color: '#000',
-                btnColor: '#ed1c24'
+                color: '#000'
             }
         }
-    },{
+    }, {
         container: '#test2',
         options: {
             carousel: {
