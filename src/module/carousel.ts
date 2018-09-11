@@ -52,7 +52,7 @@ export class Carousel {
 
         let container: ICgElement = {
             element: carouselElement!,
-            styles: this.gallery.options!.carousel!.padding ? [['padding'], [this.gallery.options!.carousel!.padding!]] : undefined,
+            styles: this.gallery.options!.carousel!.padding ? { values: [['padding', this.gallery.options!.carousel!.padding!]] } : undefined,
             children: [
                 {
                     element: listelement!, tagName: _HTML.Tags.ul,
@@ -117,13 +117,33 @@ export class Carousel {
                 {
                     classes: `${_CLASSNAMES.btn} ${_CLASSNAMES.left}`,
                     eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(-1); } }],
-                    children: [{ classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}` }]
+                    children: [{
+                        tagName: _HTML.Tags.i, classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}`,
+                        styles: this.gallery.options!.carousel!.btnColor ? {
+                            childValues: [{
+                                id: ':before',
+                                values: [
+                                    ['color', this.gallery.options!.carousel!.btnColor]
+                                ]
+                            }]
+                        } : undefined
+                    }]
                 },
                 // RIGHT CLICK
                 {
                     classes: `${_CLASSNAMES.btn} ${_CLASSNAMES.right}`,
                     eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(1); } }],
-                    children: [{ classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.right}` }]
+                    children: [{
+                        tagName: _HTML.Tags.i, classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.right}`,
+                        styles: this.gallery.options!.carousel!.btnColor ? {
+                            childValues: [{
+                                id: ':before',
+                                values: [
+                                    ['color', this.gallery.options!.carousel!.btnColor]
+                                ]
+                            }]
+                        } : undefined
+                    }]
                 }]
         }
 

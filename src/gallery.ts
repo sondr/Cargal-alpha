@@ -23,13 +23,19 @@ export class Gallery {
     }
 
     private find_galleries(config: Config) {
+        const instanceOptionsExist = config.instances && Array.isArray(config.instances) && config.instances.length > 0;
+
         let extMedia = this.find_external_images();
-        
+
         let galleries: GalleryInstance[] = [];
         // options by javascript instances
-        if (config.instances && Array.isArray(config.instances)) {
+
+        if (instanceOptionsExist) {
             galleries = config.instances!.map(instance => {
-                if (typeof instance.container === _TYPES.string) instance.container = Find_Element(_PLATFORM.DOM, (<string>instance.container));
+                if (typeof instance.container === _TYPES.string) {
+                    instance.ContainerId = <string>instance.container;
+                    instance.container = Find_Element(_PLATFORM.DOM, (<string>instance.container));
+                }
                 return instance;
             }).filter(e => e.container);
         }
@@ -53,7 +59,7 @@ export class Gallery {
 
         // Rest of external media push to gallery
         if (extMedia.length > 0) {
-            let groupedById: { key: string, media: HTMLElement[] }[] = [];
+            let groupedById: { key: string, media: HTMLElement[], options?: Options }[] = [];
             //let groupedById: any = {};
             extMedia.forEach(media => {
                 let id = media.dataset[_DATA_SETS.external.include];
@@ -65,10 +71,20 @@ export class Gallery {
                     media: [media]
                 });
             });
+
+            if (instanceOptionsExist)
+                groupedById.forEach(group => {
+                    let opts = config.instances!.find(e => e.ContainerId == `#${group.key}`);
+                    if (opts)
+                        group.options = opts.options;
+                });
+
+
             if (groupedById.length > 0)
                 Array.prototype.push.apply(galleries, groupedById.map(group => <GalleryInstance>{
                     ContainerId: group.key,
-                    externalMedia: group.media
+                    externalMedia: group.media,
+                    options: group.options
                 }));
         }
 

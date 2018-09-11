@@ -3,12 +3,24 @@ import { Carousel } from "./module/carousel";
 import { Fullscreen } from "./module/fullscreen";
 import { CgElement } from "./dom/utils";
 
-export interface ICreateElementObject{
+export interface ICreateElementObject {
     elementTagOrElement: string | HTMLElement;
     classes: string;
     textContent?: string;
     attr?: string[][];
     //styles?: string;
+}
+
+export interface dynCssVariables {
+    id: string;
+    value: string;
+    childValues?: dynCssVariables[]
+}
+
+export interface IcGElementStyleObject {
+    id?: string | string[];
+    values?: string[][];
+    childValues?: IcGElementStyleObject[];
 }
 
 export interface ICgElement {
@@ -18,7 +30,8 @@ export interface ICgElement {
     tagName?: string;
     textContent?: string;
     classes?: string;
-    styles?: string[][];
+    //styles?: string[][];
+    styles?: IcGElementStyleObject;
     children?: (CgElement | ICgElement | undefined)[];
     eventListeners?: InyGalleryEventListener[];
     attr?: string[][];

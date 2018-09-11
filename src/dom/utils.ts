@@ -167,3 +167,13 @@ export function isObject(item: any): boolean {
 export function isMergebleObject(item: any): boolean {
     return isObject(item) && !Array.isArray(item);
 };
+
+
+export function Get_YoutubeImg(id: string, quality?: number) {
+    let resolutions = ['hq', 'sd', 'maxres'];
+    if (typeof quality != 'number') quality = 1;
+    else if (quality < 0) quality = 0;
+    else if (quality > resolutions.length - 1) quality = resolutions.length - 1;
+
+    return `https://img.youtube.com/vi/${id}/${resolutions[quality]}default.jpg`
+}

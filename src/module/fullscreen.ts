@@ -45,7 +45,7 @@ export class Fullscreen {
         }, this);
 
         if (this.options.fullscreen!.backgroundColor)
-            this.overlayStyleClass = _PLATFORM.styleSheet.appendStyle([['background', this.options.fullscreen!.backgroundColor!]]);
+            this.overlayStyleClass = _PLATFORM.styleSheet.appendStyle({ values: [['background', this.options.fullscreen!.backgroundColor!]] });
     }
 
     createContainerElements() {
@@ -81,7 +81,7 @@ export class Fullscreen {
     createMenuBar() {
         this.titleElement = new CgElement({
             classes: _CLASSNAMES.fullscreenMenuBarTitle, textContent: '',
-            styles: this.options.fullscreen!.color ? [['color'], [this.options.fullscreen!.color!]] : undefined
+            styles: this.options.fullscreen!.color ? { values: [['color', this.options.fullscreen!.color!]] } : undefined
         });
         return new CgElement({
             classes: _CLASSNAMES.fullscreenMenuBar, children: [
@@ -97,10 +97,12 @@ export class Fullscreen {
                         {
                             tagName: _HTML.Tags.li, classes: _CLASSNAMES.fullscreenMenuBarBtn, eventListeners: [{
                                 action: _EVENT_ACTIONS.click, handler: (event) => { this.setThumbnailsActiveState(); }
-                            }], styles: this.options.fullscreen!.btnBackgroundColor ? [['color'], [this.options.fullscreen!.btnBackgroundColor!]] : undefined,
+                            }], styles: this.options.fullscreen!.btnBackgroundColor ? { values: [['color', this.options.fullscreen!.btnBackgroundColor!]] } : undefined,
                             children: [{
                                 tagName: _HTML.Tags.i, classes: _CLASSNAMES.iconThumbnails,
-                                styles: this.options.fullscreen!.color ? [['border-color'], [this.options.fullscreen!.color]] : undefined
+                                styles: this.options.fullscreen!.color ? {
+                                    values: [['border-color', this.options.fullscreen!.color]]
+                                } : undefined
                             }]
                         },
                         {
@@ -108,8 +110,14 @@ export class Fullscreen {
                                 action: _EVENT_ACTIONS.click, handler: (event) => { _PLATFORM.overlay.close(); }
                             }], children: [{
                                 tagName: _HTML.Tags.i, classes: _CLASSNAMES.iconClose,
-                                styles: this.options.fullscreen!.color ? [['background-color'], [this.options.fullscreen!.color!]] : undefined
-                            }], //styles: this.options.fullscreen!.btnBackgroundColor ? `color:${this.options.fullscreen!.btnBackgroundColor};` : undefined,
+                                styles: this.options.fullscreen!.color ? {
+                                    //values: [['background-color', this.options.fullscreen!.color!]],
+                                    childValues: [{
+                                        id: [':before', ':after'],
+                                        values: [['background-color', this.options.fullscreen!.color!]]
+                                    }]
+                                } : undefined
+                            }]
                         }
                     ]
                 }

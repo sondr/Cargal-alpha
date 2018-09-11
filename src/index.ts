@@ -13,6 +13,18 @@ const testConfig: Config = {
             },
             fullscreen: {
                 backgroundColor: '#fff',
+                color: '#000',
+                btnColor: '#ed1c24'
+            }
+        }
+    }, {
+        container: '#test2',
+        options: {
+            carousel: {
+                autoplay: false
+            },
+            fullscreen: {
+                backgroundColor: '#fff',
                 color: '#000'
             }
         }
