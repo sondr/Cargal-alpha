@@ -1,23 +1,26 @@
-import { MenuBar } from './menu-bar';
 import { _PLATFORM } from './../platform';
 import { _CLASSNAMES, _HTML, _EVENT_ACTIONS } from '../constants';
-import { nyGalleryElement } from './utils';
+import { CgElement } from './utils';
 
 export class Overlay {
-    private element: nyGalleryElement;
+    private element: CgElement;
+    private initialClasses: string;
     private lastActiveElement?: HTMLElement;
 
     constructor() {
-        this.element = new nyGalleryElement({ classes: _CLASSNAMES.overlay });
+        this.element = new CgElement({ classes: _CLASSNAMES.overlay });
+        this.initialClasses = this.element.Element.className.substr(0);
+        console.log("initalClasses: ", this.initialClasses);
         this.append_overlay();
     }
 
-    public get Container(){
+    public get Container() {
         return this.element;
     }
 
-    public show(fullscreenElement: HTMLElement) {
-        console.log("fullscreenElement: ", fullscreenElement);
+    public show(fullscreenElement: HTMLElement, overlayClass?: string) {
+        this.element.Element.className = this.initialClasses + (overlayClass ? ` ${overlayClass}` : '');
+
         if (this.lastActiveElement)
             this.element.Element!.removeChild(this.lastActiveElement);
 
@@ -30,6 +33,7 @@ export class Overlay {
 
     public close() {
         this.element.Element!.classList.remove(_CLASSNAMES.active);
+        this.element.Element.style.background = '';
         this.allow_scroll();
     }
 

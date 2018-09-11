@@ -1,15 +1,25 @@
+import { Gallery } from './gallery';
 import { Carousel } from "./module/carousel";
 import { Fullscreen } from "./module/fullscreen";
-import { nyGalleryElement } from "./dom/utils";
+import { CgElement } from "./dom/utils";
 
-export interface InyGalleryElement {
+export interface ICreateElementObject{
+    elementTagOrElement: string | HTMLElement;
+    classes: string;
+    textContent?: string;
+    attr?: string[][];
+    //styles?: string;
+}
+
+export interface ICgElement {
     //get ele?: HTMLElement;
     element?: HTMLElement;
     parentElement?: HTMLElement;
     tagName?: string;
     textContent?: string;
     classes?: string;
-    children?: (nyGalleryElement | InyGalleryElement | undefined)[];
+    styles?: string[][];
+    children?: (CgElement | ICgElement | undefined)[];
     eventListeners?: InyGalleryEventListener[];
     attr?: string[][];
 }
@@ -34,6 +44,7 @@ export interface Config {
 }
 
 export interface GalleryInstance {
+    instance?: IGallery;
     ContainerId?: string;
     container?: HTMLElement | string | null;
     options: Options;
@@ -73,7 +84,9 @@ export interface CarouselOptions {
 
     thumbnails?: boolean;
 
+    padding?: string;
     backgroundColor?: string;
+    color?: string;
 
     btnColor?: string;
     btnBackgroundColor?: string;

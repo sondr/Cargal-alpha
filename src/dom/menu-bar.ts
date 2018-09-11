@@ -1,11 +1,11 @@
 import { _CLASSNAMES, _EVENT_ACTIONS, _HTML } from './../constants';
 import { _PLATFORM } from './../platform';
-import { nyGalleryElement } from './utils';
+import { CgElement } from './utils';
 
 export class MenuBar {
-    private readonly element: nyGalleryElement;
+    private readonly element: CgElement;
 
-    constructor(container?: nyGalleryElement) {
+    constructor(container?: CgElement) {
         this.element = this.create_element();
         console.log("menubar: 0", this.element);
 
@@ -28,7 +28,7 @@ export class MenuBar {
     }
 
     private create_element() {
-        return new nyGalleryElement({
+        return new CgElement({
             classes: _CLASSNAMES.fullscreenMenuBar, children: [
                 {
                     classes: _CLASSNAMES.fullscreenMenuBarTitle, textContent: ''

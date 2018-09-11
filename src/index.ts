@@ -4,21 +4,27 @@ import { Gallery } from './gallery';
 import { Config } from './interfaces';
 import { Configure } from './config';
 
-const testConfig: Config = { 
-    instances:[{
+const testConfig: Config = {
+    instances: [{
         container: '#test',
-        options:{
-            carousel:{
+        options: {
+            carousel: {
                 autoplay: false
             },
             fullscreen: {
-                backgroundColor: '#fff'
+                backgroundColor: '#fff',
+                color: '#000'
             }
         }
     }]
- };
+};
 
-export async function init(config?: Config) {
-    //new Gallery(await Configure(config));
-    new Gallery(await Configure(testConfig));
+// export async function init(config?: Config) {
+//     return new Gallery(await Configure(config));
+// }
+
+export function init(config?: Config) {
+    return new Gallery(Configure(config));
 }
+
+//export default Gallery;

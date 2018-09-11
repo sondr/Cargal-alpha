@@ -14,14 +14,8 @@ export class Gallery {
     constructor(config: Config) {
         PLATFORM.create(config.document, config.window, config.containerElement as HTMLElement, config.defaultOptions!);
 
-        console.log("find galleries: ");
         let instances = this.find_galleries(config);
         this.setup(instances);
-        console.log("find galleries end");
-
-        // if (config.autoInit)
-        //     this.find_DOM_galleries(config);
-        this.setup();
     }
 
     private find_external_images() {
@@ -30,8 +24,7 @@ export class Gallery {
 
     private find_galleries(config: Config) {
         let extMedia = this.find_external_images();
-        console.log(extMedia);
-
+        
         let galleries: GalleryInstance[] = [];
         // options by javascript instances
         if (config.instances && Array.isArray(config.instances)) {
@@ -60,7 +53,6 @@ export class Gallery {
 
         // Rest of external media push to gallery
         if (extMedia.length > 0) {
-            console.log("still media");
             let groupedById: { key: string, media: HTMLElement[] }[] = [];
             //let groupedById: any = {};
             extMedia.forEach(media => {
@@ -90,9 +82,7 @@ export class Gallery {
 
     private get_autoinit_galleries(excludeContainers: HTMLElement[] = []): GalleryInstance[] {
         let galleries = (Array.from(_PLATFORM.DOM.getElementsByClassName(_CLASSNAMES.carouselContainer!) || []) as HTMLElement[])
-            .filter(e => !excludeContainers.includes(e));
-
-        console.log("autoinitGals: ", galleries);
+            .filter(e => !excludeContainers.some(f => f === e));// .includes(e));
 
         return galleries.map(containerElement => {
             return <GalleryInstance>{
@@ -110,70 +100,49 @@ export class Gallery {
         return opts;
     }
 
-    private find_DOM_galleries(config: Config) {
-
-        let domGalleries = _PLATFORM.DOM.getElementsByClassName(_CLASSNAMES.carouselContainer!);
-        let externalImg = Array.from(_PLATFORM.DOM.getElementsByClassName(_CLASSNAMES.externalIncludeImage!) || []) as HTMLDivElement[];
-
-        for (let i = 0; i < domGalleries.length; i++) {
-            let container = domGalleries.item(i) as HTMLElement;
-            let externalMedia: HTMLDivElement[] = [];
-
-            let opts = Object.assign({}, _PLATFORM.defaultOptions);
-            if (container.id) {
-                opts.Id = container.id;
-                externalMedia = externalImg.filter(e => e.dataset.cgGalleryId == opts.Id).map(e => {
-                    let el = e.cloneNode(true);
-                    let wrapper = createElement(_HTML.Tags.div, _CLASSNAMES.item) as HTMLDivElement;
-                    wrapper.appendChild(el);
-
-                    return wrapper;
-                });
-            } else
-                opts.Id = `cg-id-${i}`;
-
-            this.galleries.push({
-                Id: GalleryId++,
-                options: opts,
-                //container: Find_Element(container, `.${_CLASSNAMES.carouselOuter}`)!,
-                container: container,
-                media: convertToMediaObjects(Array.from(container.getElementsByClassName(_CLASSNAMES.item) || []) as HTMLElement[]),
-                externalMedia: convertToMediaObjects(externalMedia)
-            });
-        }
-    }
-
     private setup(instances?: GalleryInstance[]) {
         if (!instances || instances.length <= 0) return;
 
-        this.galleries = instances.map(instance => <IGallery>{
-            Id: GalleryId++,
-            options: instance.options,
-            container: instance.container,
-            media: instance.container ?
-                convertToMediaObjects(Array.from((<HTMLElement>instance.container).getElementsByClassName(_CLASSNAMES.item) || []) as HTMLElement[]) :
-                [],
-            externalMedia: convertToMediaObjects(instance.externalMedia!.map(media => {
-                const removeFromDom = !!media.dataset[_DATA_SETS.external.removeFromDOM];
-                let element = removeFromDom ? media : media.cloneNode(true) as HTMLElement;
-                if (element.classList.contains(_CLASSNAMES.item)) return element;
+        this.galleries = instances.map(instance => {
+            let gallery: IGallery = {
+                Id: GalleryId++,
+                options: instance.options,
+                container: <HTMLElement>instance.container,
+                media: instance.container ?
+                    convertToMediaObjects(Array.from((<HTMLElement>instance.container).getElementsByClassName(_CLASSNAMES.item) || []) as HTMLElement[]) :
+                    [],
+                externalMedia: convertToMediaObjects(instance.externalMedia!.map(media => {
+                    const removeFromDom = !!media.dataset[_DATA_SETS.external.removeFromDOM];
+                    let element = removeFromDom ? media : media.cloneNode(true) as HTMLElement;
+                    if (element.classList.contains(_CLASSNAMES.item))
+                        return removeFromDom ? element : [element, media];
 
-                let wrapper = createElement(_HTML.Tags.div, _CLASSNAMES.item);
-                wrapper.appendChild(element);
+                    let wrapper = createElement({
+                        elementTagOrElement: _HTML.Tags.li,
+                        classes: _CLASSNAMES.item
+                    });
+                    wrapper.appendChild(element);
 
-                return [wrapper, element];
-            }))
+                    return removeFromDom ? wrapper : [wrapper, media];
+                }))
+            };
+
+            instance.instance = gallery;
+
+            return gallery;
         });
-
-        console.log(this.galleries);
 
         this.galleries.forEach(gallery => {
-            this.Attach_EventListeners(gallery);
-
-            if(gallery.container) gallery.Carousel = new Carousel(gallery);
+            if (gallery.container) gallery.Carousel = new Carousel(gallery);
             if (gallery.options!.enableFullScreen || !gallery.container)
                 gallery.Fullscreen = new Fullscreen(gallery);
+
+            this.Attach_EventListeners(gallery);
+
         });
+
+        //building dyamic stylesheet
+        _PLATFORM.styleSheet.buildSheet();
     }
 
     private Attach_EventListeners(gallery: IGallery) {
@@ -186,8 +155,7 @@ export class Gallery {
                 gallery.Fullscreen!.show(index)));
 
         gallery.externalMedia.filter(img => img.origin).forEach((img, index) =>
-            img.origin!.addEventListener(_EVENT_ACTIONS.click, (event) =>{
-                console.log("externalMedia Origin: ", img);
+            img.origin!.addEventListener(_EVENT_ACTIONS.click, (event) => {
                 gallery.Fullscreen!.show(imgCount + index);
             }));
     }

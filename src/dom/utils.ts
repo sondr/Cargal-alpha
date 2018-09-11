@@ -1,14 +1,18 @@
 import { _DATA_SETS } from './../constants';
-import { IMedia } from './../interfaces';
+import { IMedia, ICreateElementObject } from './../interfaces';
 import { _PLATFORM } from './../platform';
 import { _HTML } from '../constants';
-import { InyGalleryElement } from '../interfaces';
+import { ICgElement } from '../interfaces';
 
-export function createElement(elementTagOrElement: string | HTMLElement, classes: string, textContent?: string, attr?: string[][]) {
-    let element = typeof elementTagOrElement === 'string' ? _PLATFORM.DOM.createElement(elementTagOrElement) : elementTagOrElement;
-    if (classes) element.className = classes;
-    if (textContent) element.textContent = textContent;
-    if (attr && Array.isArray(attr)) attr.forEach(a => (<any>element)[a[0]] = a[1]);
+
+
+//export function createElement(elementTagOrElement: string | HTMLElement, classes: string, textContent?: string, attr?: string[][]) {
+export function createElement(createObject: ICreateElementObject) {
+    let element = typeof createObject.elementTagOrElement === 'string' ? _PLATFORM.DOM.createElement(createObject.elementTagOrElement) : createObject.elementTagOrElement;
+    if (createObject.classes) element.className += `${createObject.classes}`;
+    //if (createObject.styles) element.setAttribute('style', createObject.styles);
+    if (createObject.textContent) element.textContent = createObject.textContent;
+    if (createObject.attr && Array.isArray(createObject.attr)) createObject.attr.forEach(a => (<any>element)[a[0]] = a[1]);
 
     return element;
 }
@@ -29,17 +33,28 @@ export function convertToMediaObject(element: HTMLElement | HTMLElement[]) {
     };
 }
 
-export class nyGalleryElement {
+export class CgElement {
     public parentElement: HTMLElement;
     private readonly element: HTMLElement;
-    public readonly children?: nyGalleryElement[];
-    public readonly options: InyGalleryElement;
+    public readonly children?: CgElement[];
+    public readonly options: ICgElement;
 
-    constructor(opts?: InyGalleryElement) {
+    constructor(opts?: ICgElement) {
         if (!opts!.tagName) opts!.tagName = _HTML.Tags.div;
         this.parentElement = opts!.parentElement!;
         this.options = opts!;
-        this.element = createElement(opts!.element || opts!.tagName!, opts!.classes!, this.options.textContent, this.options.attr);
+        if (this.options.styles) {
+            const dynamicStyleClass = _PLATFORM.styleSheet.appendStyle(this.options.styles);
+            if (!this.options.classes) this.options.classes = '';
+            this.options.classes += ` ${dynamicStyleClass}`;
+        }
+        this.element = createElement({
+            elementTagOrElement: opts!.element || opts!.tagName!,
+            classes: this.options!.classes!,
+            textContent: this.options.textContent,
+            attr: this.options.attr,
+            //styles:opts!.styles
+        });
         //if (!opts!.element)
         opts!.element = this.element;
 
@@ -67,7 +82,7 @@ export class nyGalleryElement {
         this.setParent(this.parentElement);
     }
 
-    private mapChildren(children: (nyGalleryElement | InyGalleryElement | undefined)[]) {
+    private mapChildren(children: (CgElement | ICgElement | undefined)[]) {
         if (!children || !Array.isArray(children)) return [];
 
         return children.map(child => {
@@ -75,14 +90,14 @@ export class nyGalleryElement {
         });
     }
 
-    public appendChild(child: nyGalleryElement | InyGalleryElement): nyGalleryElement {
-        if (child instanceof nyGalleryElement) {
+    public appendChild(child: CgElement | ICgElement): CgElement {
+        if (child instanceof CgElement) {
             if (!child.parentElement) child.setParent(this.element);
-            return <nyGalleryElement>child;
+            return <CgElement>child;
         }
 
         child!.parentElement = this.element;
-        return new nyGalleryElement(<InyGalleryElement>child);
+        return new CgElement(<ICgElement>child);
     }
 
     public dispose() {

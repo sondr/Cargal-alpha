@@ -1,9 +1,9 @@
 import { Fullscreen } from './fullscreen';
-import { nyGalleryElement, Find_Element } from './../dom/utils';
+import { CgElement, Find_Element } from './../dom/utils';
 import { _PLATFORM } from './../platform';
 import { _CLASSNAMES, _EVENT_ACTIONS, _HTML } from './../constants';
 import { Thumbnails } from './thumbnails';
-import { IGallery, InyGalleryElement } from '../interfaces';
+import { IGallery, ICgElement } from '../interfaces';
 
 export class Carousel {
     public readonly fullScreen: Fullscreen;
@@ -12,9 +12,9 @@ export class Carousel {
     private running: boolean = false;
     private intervalTimer: any;
     private activeIndex?: number;
-    private element?: nyGalleryElement;
+    private element?: CgElement;
 
-    private buttonContainer?: InyGalleryElement;
+    private buttonContainer?: ICgElement;
 
     constructor(gallery: IGallery, fullScreen?: Fullscreen) {
         this.fullScreen = fullScreen!;
@@ -50,12 +50,13 @@ export class Carousel {
 
         let lastTouchStartEvent: TouchEvent | null;
 
-        let container: InyGalleryElement = {
+        let container: ICgElement = {
             element: carouselElement!,
+            styles: this.gallery.options!.carousel!.padding ? [['padding'], [this.gallery.options!.carousel!.padding!]] : undefined,
             children: [
                 {
                     element: listelement!, tagName: _HTML.Tags.ul,
-                    children: this.gallery.media.map(el => <InyGalleryElement>{
+                    children: this.gallery.media.map(el => <ICgElement>{
                         element: el.element
                     })
                 },
@@ -94,7 +95,7 @@ export class Carousel {
             element: this.gallery.container, children: [container]
         };
 
-        this.element = new nyGalleryElement(container);
+        this.element = new CgElement(container);
 
         if (this.gallery.media.length <= 0) return;
 

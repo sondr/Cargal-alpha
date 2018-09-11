@@ -1,6 +1,6 @@
-import { Media } from './../interfaces';
+import { Media, ICgElement } from './../interfaces';
 import { _CLASSNAMES, _EVENT_ACTIONS, _TYPES, _HTML } from './../constants';
-import { nyGalleryElement, convertToMediaObjects } from './../dom/utils';
+import { CgElement, convertToMediaObjects } from './../dom/utils';
 //import { MenuBar } from './../dom/menu-bar';
 import { Carousel } from './carousel';
 import { _PLATFORM } from './../platform';
@@ -10,11 +10,13 @@ export class Fullscreen {
     private readonly gallery: IGallery;
     private readonly images: IMedia[];
     private readonly carousel: Carousel;
-    private readonly menubar: nyGalleryElement;
-    private element?: nyGalleryElement;
-    private carouselContainer?: nyGalleryElement;
+    private readonly menubar: CgElement;
+    private element?: CgElement;
+    private carouselContainer?: CgElement;
     private options: Options;
-    private titleElement?: nyGalleryElement;
+    private titleElement?: CgElement;
+
+    private overlayStyleClass?: string;
 
     constructor(gallery: IGallery) {
         this.gallery = gallery;
@@ -41,11 +43,14 @@ export class Fullscreen {
             container: this.element!.Element,
             options: opts
         }, this);
+
+        if (this.options.fullscreen!.backgroundColor)
+            this.overlayStyleClass = _PLATFORM.styleSheet.appendStyle([['background', this.options.fullscreen!.backgroundColor!]]);
     }
 
     createContainerElements() {
-        this.carouselContainer = new nyGalleryElement({ classes: _CLASSNAMES.carousel });
-        this.element = new nyGalleryElement({ classes: `${_CLASSNAMES.fullscreenContainer} ${this.options.carousel!.thumbnails ? _CLASSNAMES.thumbsActive : ''}` });
+        this.carouselContainer = new CgElement({ classes: _CLASSNAMES.carousel });
+        this.element = new CgElement({ classes: `${_CLASSNAMES.fullscreenContainer} ${this.options.carousel!.thumbnails ? _CLASSNAMES.thumbsActive : ''}` });
         this.element.appendChild(this.menubar);
         this.element.appendChild(this.carouselContainer);
     }
@@ -54,7 +59,7 @@ export class Fullscreen {
         this.setMenubarFixed(this.gallery.options!.fullscreen!.menuBarFixed!);
         if (index) this.carousel.set_active(index);
 
-        _PLATFORM.overlay.show(this.element!.Element);
+        _PLATFORM.overlay.show(this.element!.Element, this.overlayStyleClass);
     }
 
     dispose() {
@@ -74,8 +79,11 @@ export class Fullscreen {
     }
 
     createMenuBar() {
-        this.titleElement = new nyGalleryElement({ classes: _CLASSNAMES.fullscreenMenuBarTitle, textContent: '' });
-        return new nyGalleryElement({
+        this.titleElement = new CgElement({
+            classes: _CLASSNAMES.fullscreenMenuBarTitle, textContent: '',
+            styles: this.options.fullscreen!.color ? [['color'], [this.options.fullscreen!.color!]] : undefined
+        });
+        return new CgElement({
             classes: _CLASSNAMES.fullscreenMenuBar, children: [
                 this.titleElement,
                 {
@@ -89,12 +97,19 @@ export class Fullscreen {
                         {
                             tagName: _HTML.Tags.li, classes: _CLASSNAMES.fullscreenMenuBarBtn, eventListeners: [{
                                 action: _EVENT_ACTIONS.click, handler: (event) => { this.setThumbnailsActiveState(); }
-                            }], children: [{ tagName: _HTML.Tags.i, classes: _CLASSNAMES.iconThumbnails }]
+                            }], styles: this.options.fullscreen!.btnBackgroundColor ? [['color'], [this.options.fullscreen!.btnBackgroundColor!]] : undefined,
+                            children: [{
+                                tagName: _HTML.Tags.i, classes: _CLASSNAMES.iconThumbnails,
+                                styles: this.options.fullscreen!.color ? [['border-color'], [this.options.fullscreen!.color]] : undefined
+                            }]
                         },
                         {
                             tagName: _HTML.Tags.li, classes: _CLASSNAMES.fullscreenMenuBarBtn, eventListeners: [{
                                 action: _EVENT_ACTIONS.click, handler: (event) => { _PLATFORM.overlay.close(); }
-                            }], children: [{ tagName: _HTML.Tags.i, classes: _CLASSNAMES.iconClose }]
+                            }], children: [{
+                                tagName: _HTML.Tags.i, classes: _CLASSNAMES.iconClose,
+                                styles: this.options.fullscreen!.color ? [['background-color'], [this.options.fullscreen!.color!]] : undefined
+                            }], //styles: this.options.fullscreen!.btnBackgroundColor ? `color:${this.options.fullscreen!.btnBackgroundColor};` : undefined,
                         }
                     ]
                 }

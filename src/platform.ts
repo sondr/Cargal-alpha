@@ -1,5 +1,6 @@
 import { Options } from './interfaces';
 import { Overlay } from './dom/overlay';
+import { DynamicStyle } from './dom/dynamic-styles';
 
 export let _PLATFORM: PLATFORM;
 
@@ -8,6 +9,7 @@ export class PLATFORM {
     public readonly global: Window;
     public readonly container: HTMLElement;
     public readonly overlay: Overlay;
+    public readonly styleSheet: DynamicStyle;
     public readonly defaultOptions: Options;
     public readonly variables: any;
 
@@ -22,7 +24,10 @@ export class PLATFORM {
         this.container = container;
         this.defaultOptions = defaultOptions;
         this.variables = {};
+
         _PLATFORM = this;
+        
         this.overlay = new Overlay();
+        this.styleSheet = new DynamicStyle();
     }
 }

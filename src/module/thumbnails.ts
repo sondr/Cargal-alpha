@@ -1,15 +1,15 @@
 import { _CLASSNAMES, _EVENT_ACTIONS, _HTML, _TYPES } from './../constants';
 import { _PLATFORM } from './../platform';
-import { nyGalleryElement,Find_Element } from '../dom/utils';
+import { CgElement,Find_Element } from '../dom/utils';
 import { Carousel } from './carousel';
-import { InyGalleryElement } from '../interfaces';
+import { ICgElement } from '../interfaces';
 
 export class Thumbnails {
     private active: boolean;
     private carousel: Carousel;
 
-    private model: nyGalleryElement;
-    private thumbnailList?: nyGalleryElement;
+    private model: CgElement;
+    private thumbnailList?: CgElement;
 
     constructor(carousel: Carousel) {
         this.active = !!carousel.gallery.options!.carousel!.thumbnails!;
@@ -39,7 +39,7 @@ export class Thumbnails {
 
     init() {
 
-        return new nyGalleryElement({
+        return new CgElement({
             parentElement: this.carousel.Element!.Element,
             classes: `${_CLASSNAMES.thumbnailContainer} ${this.carousel.gallery.options!.carousel!.thumbnails ? _CLASSNAMES.active : ''}`, children: [
                 // {
@@ -64,8 +64,8 @@ export class Thumbnails {
             this.thumbnailList!.children![index].Element.classList.add(_CLASSNAMES.active);
     }
 
-    create_thumbnails(): nyGalleryElement {
-        let thumbnailList: InyGalleryElement = { tagName: _HTML.Tags.ul,
+    create_thumbnails(): CgElement {
+        let thumbnailList: ICgElement = { tagName: _HTML.Tags.ul,
             eventListeners: [
                 { action: _EVENT_ACTIONS.mouseDown, handler: e => { 
                     e.preventDefault();
@@ -96,7 +96,7 @@ export class Thumbnails {
             });
         });
         
-        this.thumbnailList = new nyGalleryElement(thumbnailList);
+        this.thumbnailList = new CgElement(thumbnailList);
         return this.thumbnailList;
     }
 
