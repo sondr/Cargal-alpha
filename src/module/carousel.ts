@@ -15,13 +15,13 @@ export class Carousel {
     private element?: CgElement;
 
     private buttonContainer?: ICgElement;
-    private btnsKeys: string[];
+    private btnsEntries: [string, any][];
 
     constructor(gallery: IGallery, fullScreen?: Fullscreen) {
         this.fullScreen = fullScreen!;
         this.gallery = gallery;
-        this.btnsKeys = Object.keys(this.gallery.options!.carousel!.btns!);
-        console.log("btnkeys: ", this.btnsKeys);
+        this.btnsEntries = Object.entries(this.gallery.options!.carousel!.btns!).filter(e => e[1]);
+        console.log("btnkeys: ", this.btnsEntries);
         this.init();
 
         if (this.gallery.options!.carousel!.thumbnails)
@@ -113,6 +113,7 @@ export class Carousel {
 
     createButtons() {
         let chevronColorStyles = this.ChevronColor;
+        let btnStyles = this.BtnStyles;
 
         this.buttonContainer = {
             //classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.hidden}`,
@@ -122,6 +123,7 @@ export class Carousel {
                 {
                     classes: `${_CLASSNAMES.btn} ${_CLASSNAMES.left}`,
                     eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(-1); } }],
+                    styles: btnStyles,
                     children: [{
                         tagName: _HTML.Tags.i, classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}`,
                         styles: chevronColorStyles
@@ -131,6 +133,7 @@ export class Carousel {
                 {
                     classes: `${_CLASSNAMES.btn} ${_CLASSNAMES.right}`,
                     eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(1); } }],
+                    styles: btnStyles,
                     children: [{
                         tagName: _HTML.Tags.i, classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.right}`,
                         styles: chevronColorStyles
@@ -141,16 +144,36 @@ export class Carousel {
         return this.buttonContainer;
     }
 
+    static styleDictionary = {
+        color: ':before',
+        hover: ':hover>i:before',
+        backgroundHover: '',
+    };
+
+    private get BtnStyles() {
+        const keys = this.btnsEntries.find(e => e[0] == 'color');
+
+        let childValues = this.btnsEntries.filter(e => ['backgroundHover', 'hover'].includes(e[0])).map(e =>{
+
+        });
+
+        return {
+            childValues: [
+                {
+                    id: ':hover>i:before', values: [
+                        ['color', 'green']
+                    ]
+                }
+            ]
+        };
+    }
+
     private get ChevronColor(): IcGElementStyleObject | undefined {
-        const key = this.btnsKeys.find(e => e == 'color');
+        const key = this.btnsEntries.find(e => e[0] == 'color');
         return key ? <IcGElementStyleObject>{
             childValues: [{
                 id: ':before', values: [
-                    ['color', this.gallery.options!.carousel!.btns!.color],
-                ]
-            }, {
-                id: ':hover:before', values: [
-                    ['color', 'green']
+                    [key[0], key[1]]
                 ]
             }]
         } : undefined;
@@ -162,11 +185,11 @@ export class Carousel {
     // backgroundHover?: string;
 
     private get BtnBackground() {
-        const key = this.btnsKeys.find(e => e == 'color');
+        const key = this.btnsEntries.find(e => e[0] == 'color');
         return key ? <IcGElementStyleObject>{
             childValues: [{
                 id: ':before', values: [
-                    ['color', this.gallery.options!.carousel!.btns!.color]
+                    [key[0], key[1]]
                 ]
             }]
         } : undefined;
