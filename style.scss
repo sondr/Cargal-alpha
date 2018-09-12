@@ -23,17 +23,14 @@ $fullScreenTextColor: #fff;
     margin: auto;
     &.cg-thumbs-active {
         .cg-carousel {
-            height: calc(100% - #{$thumbsSize}); //height: calc(100% - 100px);
+            height: calc(100% - #{$thumbsSize});
         }
     }
     .cg-fs-menubar {
-        z-index: $zIndex + 2; // flex: 0 0 64px;
-        // display: flex;
-        // flex-flow: row;
+        z-index: $zIndex + 2; 
         width: 100%;
         color: #{$fullScreenTextColor};
         .cg-fs-menubar-title {
-            //flex: 1 1 auto;
             float: left;
             font-size: 40px;
             line-height: 64px;
@@ -46,12 +43,11 @@ $fullScreenTextColor: #fff;
             margin: 0;
             padding: 0;
             overflow: hidden;
-            text-align: center; // should be variable
-            vertical-align: middle; //flex: 0 1 64px;
-            // display: flex;
-            // flex-direction: row;
+            text-align: center; 
+            vertical-align: middle; 
+
             li.cg-fs-menubar-btn {
-                vertical-align: middle; //flex: 0 1 64px;
+                vertical-align: middle;
                 float: left;
                 padding: 5px;
                 cursor: pointer;
@@ -119,12 +115,11 @@ $fullScreenTextColor: #fff;
     }
     .cg-btn-container {
         .cg-btn {
-            //flex: 0 1 auto;
             position: absolute;
             width: 4em; //width: 100%;
-            height: 4em; //display: flex;
-            top: calc(50% - 2em); //background-color: rbga(0,0,0,0.1)
-            background: rgba(0, 0, 0, 0.3); //opacity: 0.9;
+            height: 4em; 
+            top: calc(50% - 2em); 
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 100%;
             z-index: 2;
             cursor: pointer;
@@ -153,14 +148,12 @@ $fullScreenTextColor: #fff;
         overflow: hidden;
         text-align: center; // should be variable
         li {
-            //height: calc(100% - 12px);
             box-sizing: border-box;
             height: 100%;
             display: inline-block;
             margin: 0px 5px;
-            border: solid transparent 1px; //filter: grayscale(0);
+            border: solid transparent 1px;
             &.active {
-                //border-top: solid #fff 1px;
                 border: solid #666 1px; //filter: grayscale(10);
             }
             img {
@@ -220,12 +213,12 @@ div.cg-overlay {
     display: block;
     width: 40px;
     height: 40px; //100%;
-    //background-color: #{$fullScreenTextColor};
+    
     &:before,
     &:after {
         background-color: #{$fullScreenTextColor};
         position: absolute;
-        right: 50%; //top: 15px;
+        right: 50%;
         content: ' ';
         height: 33px;
         width: 2px;
@@ -245,7 +238,7 @@ div.cg-overlay {
     height: 4px;
     box-shadow: 0 -10px 0, -10px -10px 0, 10px -10px 0, 0 0 0 40px inset, 
     -10px 0 0, 10px 0 0, 0 10px 0, 
-    -10px 10px 0, 10px 10px 0; //background: #fff;
+    -10px 10px 0, 10px 10px 0;
     margin: 15px 10px;
     &:before,
     &:after {
@@ -266,7 +259,7 @@ div.cg-overlay {
 
 .cg-chevron {
     width: 100%;
-    height: 100%; //opacity: 0.5;
+    height: 100%;
 
     &:hover {
         opacity: 1;
@@ -278,13 +271,13 @@ div.cg-overlay {
         border-width: 0.2em 0.2em 0 0;
         content: '';
         display: inline-block;
-        height: 0.5em; //left: 0.15em;
+        height: 0.5em;
         position: absolute;
         top: 0.15em;
         transform: rotate(-45deg);
         vertical-align: top;
         width: 0.5em;
-        color: #fff; //box-shadow: 0.1em -0.1em 0px 0px #000;
+        color: #fff;
     }
 
     &.cg-right:before, &.cg-left:before{
