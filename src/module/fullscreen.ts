@@ -1,6 +1,6 @@
 import { Media, ICgElement } from './../interfaces';
 import { _CLASSNAMES, _EVENT_ACTIONS, _TYPES, _HTML } from './../constants';
-import { CgElement, convertToMediaObjects } from './../dom/utils';
+import { CgElement, convertToMediaObjects, deepObjectAssign } from './../dom/utils';
 //import { MenuBar } from './../dom/menu-bar';
 import { Carousel } from './carousel';
 import { _PLATFORM } from './../platform';
@@ -22,7 +22,8 @@ export class Fullscreen {
         this.gallery = gallery;
 
         let opts = JSON.parse(JSON.stringify(this.gallery.options!)) as Options;
-        opts.carousel = opts.fullscreen;
+        opts.Carousel = deepObjectAssign({}, opts.Fullscreen!.Carousel!);
+
         this.options = opts;
         this.menubar = this.createMenuBar();
         this.createContainerElements();
@@ -35,28 +36,27 @@ export class Fullscreen {
                 description: media.description
             };
         });
-        //  this.gallery.media.concat(convertToMediaObjects(this.gallery.externalMedia.map(node => 
-        //     node.element.cloneNode(true) as HTMLElement)));
-
+        
         this.carousel = new Carousel(<IGallery>{
             media: this.images,
             container: this.element!.Element,
             options: opts
         }, this);
 
-        if (this.options.fullscreen!.backgroundColor)
-            this.overlayStyleClass = _PLATFORM.styleSheet.appendStyle({ values: [['background', this.options.fullscreen!.backgroundColor!]] });
+        if (this.options.Fullscreen!.background)
+            this.overlayStyleClass = _PLATFORM.styleSheet.appendStyle({ values: [['background', this.options.Fullscreen!.background!]] });
+        console.log("overlayclass", this.overlayStyleClass, this.options.Fullscreen!.background);
     }
 
     createContainerElements() {
         this.carouselContainer = new CgElement({ classes: _CLASSNAMES.carousel });
-        this.element = new CgElement({ classes: `${_CLASSNAMES.fullscreenContainer} ${this.options.carousel!.thumbnails ? _CLASSNAMES.thumbsActive : ''}` });
+        this.element = new CgElement({ classes: `${_CLASSNAMES.fullscreenContainer} ${this.options.Carousel!.thumbnails ? _CLASSNAMES.thumbsActive : ''}` });
         this.element.appendChild(this.menubar);
         this.element.appendChild(this.carouselContainer);
     }
 
     show(index: number) {
-        this.setMenubarFixed(this.gallery.options!.fullscreen!.menuBarFixed!);
+        this.setMenubarFixed(this.gallery.options!.Fullscreen!.menuBarFixed!);
         if (index) this.carousel.set_active(index);
 
         _PLATFORM.overlay.show(this.element!.Element, this.overlayStyleClass);
@@ -81,7 +81,7 @@ export class Fullscreen {
     createMenuBar() {
         this.titleElement = new CgElement({
             classes: _CLASSNAMES.fullscreenMenuBarTitle, textContent: '',
-            styles: this.options.fullscreen!.color ? { values: [['color', this.options.fullscreen!.color!]] } : undefined
+            styles: this.options.Fullscreen!.color ? { values: [['color', this.options.Fullscreen!.color!]] } : undefined
         });
         return new CgElement({
             classes: _CLASSNAMES.fullscreenMenuBar, children: [
@@ -97,11 +97,11 @@ export class Fullscreen {
                         {
                             tagName: _HTML.Tags.li, classes: _CLASSNAMES.fullscreenMenuBarBtn, eventListeners: [{
                                 action: _EVENT_ACTIONS.click, handler: (event) => { this.setThumbnailsActiveState(); }
-                            }], styles: this.options.fullscreen!.btns!.background ? { values: [['color', this.options.fullscreen!.btns!.background!]] } : undefined,
+                            }], styles: this.options.Fullscreen!.btns!.background ? { values: [['color', this.options.Fullscreen!.btns!.background!]] } : undefined,
                             children: [{
                                 tagName: _HTML.Tags.i, classes: _CLASSNAMES.iconThumbnails,
-                                styles: this.options.fullscreen!.color ? {
-                                    values: [['border-color', this.options.fullscreen!.color]]
+                                styles: this.options.Fullscreen!.color ? {
+                                    values: [['border-color', this.options.Fullscreen!.color]]
                                 } : undefined
                             }]
                         },
@@ -110,11 +110,11 @@ export class Fullscreen {
                                 action: _EVENT_ACTIONS.click, handler: (event) => { _PLATFORM.overlay.close(); }
                             }], children: [{
                                 tagName: _HTML.Tags.i, classes: _CLASSNAMES.iconClose,
-                                styles: this.options.fullscreen!.color ? {
+                                styles: this.options.Fullscreen!.color ? {
                                     //values: [['background-color', this.options.fullscreen!.color!]],
                                     childValues: [{
                                         id: [':before', ':after'],
-                                        values: [['background-color', this.options.fullscreen!.color!]]
+                                        values: [['background-color', this.options.Fullscreen!.color!]]
                                     }]
                                 } : undefined
                             }]

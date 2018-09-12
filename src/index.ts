@@ -8,26 +8,37 @@ const testConfig: Config = {
     instances: [{
         container: '#test',
         options: {
-            carousel: {
+            Carousel: {
                 autoplay: false,
                 btns: {
-                    color: '#ed1c24'
+                    //color: '#ed1c24',
+                    hover: '#ed1c24',
+                    background: '#ed1c24',
+                    backgroundHover: '#fff'
                 }
             },
-            fullscreen: {
-                backgroundColor: '#fff',
-                color: '#000'
+            Fullscreen: {
+                background: '#fff',
+                color: '#000',
+                Carousel: {
+                    btns: {
+                        color: '#ed1c24',
+                        hover: '#fff',
+                        background: '#fff',
+                        backgroundHover: '#ed1c24'
+                    }
+                }
             }
         }
     }, {
         container: '#test2',
         options: {
-            carousel: {
+            Carousel: {
                 autoplay: false
             },
-            fullscreen: {
-                backgroundColor: '#fff',
-                color: '#000'
+            Fullscreen: {
+                background: '#fff',
+                //color: '#000'
             }
         }
     }]

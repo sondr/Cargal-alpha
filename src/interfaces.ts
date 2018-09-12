@@ -1,4 +1,3 @@
-import { Gallery } from './gallery';
 import { Carousel } from "./module/carousel";
 import { Fullscreen } from "./module/fullscreen";
 import { CgElement } from "./dom/utils";
@@ -80,8 +79,8 @@ export interface Options {
 
     //thumbnails?: boolean;
 
-    carousel?: CarouselOptions;
-    fullscreen?: fullscreenOptions;
+    Carousel?: CarouselOptions;
+    Fullscreen?: fullscreenOptions;
 }
 
 export interface Media {
@@ -99,6 +98,7 @@ export interface CarouselOptions {
 
     padding?: string;
     backgroundColor?: string;
+    overlayBackground?: string;
     color?: string;
 
     btns?: btnOptions;
@@ -107,21 +107,26 @@ export interface CarouselOptions {
     // btnBackground?: string;
     // btnBackgroundHover?: string;
 
-    opacity?: number;
+    //opacity?: number;
 
     Events?: CarouselEvents;
 }
 
-export interface btnOptions{
+export interface btnOptions {
     color?: string;
     hover?: string;
     background?: string;
     backgroundHover?: string;
 }
 
-export interface fullscreenOptions extends CarouselOptions {
+export interface fullscreenOptions {
+    background?: string;
+    color?: string;
+    opacity?: number;
     menuBarFixed?: boolean;
     Events?: FullscreenEvents;
+    Carousel?: CarouselOptions;
+    btns?: btnOptions;
 }
 
 export interface CarouselEvents {

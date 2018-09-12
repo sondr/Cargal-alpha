@@ -20,6 +20,7 @@ export class DynamicStyle {
         const name = prependText + this.counter++;
         if(!styles.values) styles.values = [];
         if(!styles.childValues) styles.childValues = [];
+        
         this.variables.push({
             id: name,
             value: styles.values.filter(s => s.length === 2).map(s => `${s[0]}:${s[1].replace(';', '') + '!important;'}`).join(' '),

@@ -12,7 +12,7 @@ export class Thumbnails {
     private thumbnailList?: CgElement;
 
     constructor(carousel: Carousel) {
-        this.active = !!carousel.gallery.options!.carousel!.thumbnails!;
+        this.active = !!carousel.gallery.options!.Carousel!.thumbnails!;
         this.carousel = carousel;
         this.model = this.init();
     }
@@ -41,7 +41,7 @@ export class Thumbnails {
 
         return new CgElement({
             parentElement: this.carousel.Element!.Element,
-            classes: `${_CLASSNAMES.thumbnailContainer} ${this.carousel.gallery.options!.carousel!.thumbnails ? _CLASSNAMES.active : ''}`, children: [
+            classes: `${_CLASSNAMES.thumbnailContainer} ${this.carousel.gallery.options!.Carousel!.thumbnails ? _CLASSNAMES.active : ''}`, children: [
                 // {
                 //     classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.left}`, children: [
                 //         { classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}` }

@@ -5,6 +5,27 @@ import { _CLASSNAMES, _EVENT_ACTIONS, _HTML } from './../constants';
 import { Thumbnails } from './thumbnails';
 import { IGallery, ICgElement, IcGElementStyleObject } from '../interfaces';
 
+interface IStyleDict {
+    color: IStyleDictValues;
+    hover: IStyleDictValues;
+    background: IStyleDictValues;
+    backgroundHover: IStyleDictValues;
+    [key: string]: IStyleDictValues;
+}
+
+interface IStyleDictValues {
+    key: string;
+    type: string;
+    sel?: string;
+}
+
+const styleDict: IStyleDict = {
+    color: { key: 'color', type: 'color', sel: ':before' },
+    hover: { key: 'hover', type: 'color', sel: ':hover>i:before' },
+    background: { key: 'background', type: 'background', sel: undefined },
+    backgroundHover: { key: 'backgroundHover', type: 'background', sel: ':hover' }
+};
+
 export class Carousel {
     public readonly fullScreen: Fullscreen;
     public readonly gallery: IGallery;
@@ -20,11 +41,11 @@ export class Carousel {
     constructor(gallery: IGallery, fullScreen?: Fullscreen) {
         this.fullScreen = fullScreen!;
         this.gallery = gallery;
-        this.btnsEntries = Object.entries(this.gallery.options!.carousel!.btns!).filter(e => e[1]);
+        this.btnsEntries = Object.entries(this.gallery.options!.Carousel!.btns!).filter(e => e[1]);
         console.log("btnkeys: ", this.btnsEntries);
         this.init();
 
-        if (this.gallery.options!.carousel!.thumbnails)
+        if (this.gallery.options!.Carousel!.thumbnails)
             this.activateThumbnails();
     }
 
@@ -55,7 +76,7 @@ export class Carousel {
 
         let container: ICgElement = {
             element: carouselElement!,
-            styles: this.gallery.options!.carousel!.padding ? { values: [['padding', this.gallery.options!.carousel!.padding!]] } : undefined,
+            styles: this.gallery.options!.Carousel!.padding ? { values: [['padding', this.gallery.options!.Carousel!.padding!]] } : undefined,
             children: [
                 {
                     element: listelement!, tagName: _HTML.Tags.ul,
@@ -71,8 +92,11 @@ export class Carousel {
                 },
                 {
                     action: _EVENT_ACTIONS.touchEnd, handler: event => {
-                        const distance = lastTouchStartEvent!.changedTouches[0].pageX - (<TouchEvent>event).changedTouches[0].pageX;
-                        if (Math.abs(distance) > 75) this.cycle(distance > 0 ? 1 : -1);
+                        console.log(lastTouchStartEvent!.touches, (<TouchEvent>event).touches)
+                        if (lastTouchStartEvent!.touches.length == 1) {
+                            const distance = lastTouchStartEvent!.changedTouches[0].pageX - (<TouchEvent>event).changedTouches[0].pageX;
+                            if (Math.abs(distance) > 75) this.cycle(distance > 0 ? 1 : -1);
+                        }
                         lastTouchStartEvent = null;
                     }
                 }
@@ -107,13 +131,14 @@ export class Carousel {
         //if (this.activeIndex == -1)
         this.set_active(this.activeIndex == -1 ? 0 : this.activeIndex);
 
-        if (this.gallery.options!.carousel!.autoplay)
+        if (this.gallery.options!.Carousel!.autoplay)
             this.play();
     }
 
     createButtons() {
-        let chevronColorStyles = this.ChevronColor;
-        let btnStyles = this.BtnStyles;
+        let chevronColorStyles = this.MakeStylesObject({ entries: this.btnsEntries, childs: [styleDict.color.key] });
+        let btnStyles = this.MakeStylesObject({ entries: this.btnsEntries, container: [styleDict.background.key], childs: [styleDict.backgroundHover.key, styleDict.hover.key] });
+        console.log("buttonStyles:", btnStyles);
 
         this.buttonContainer = {
             //classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.hidden}`,
@@ -144,55 +169,29 @@ export class Carousel {
         return this.buttonContainer;
     }
 
-    static styleDictionary = {
-        color: ':before',
-        hover: ':hover>i:before',
-        backgroundHover: '',
-    };
+    public MakeStylesObject(values: { entries: [string, any][], container?: string[], childs?: string[] }): IcGElementStyleObject | undefined {
+        if (!values) return undefined;
+        console.log(values.container);
+        values.container = values.container || [];
+        values.childs = values.childs || [];
+        if (values.container.length == 0 && values.childs.length == 0) return undefined;
 
-    private get BtnStyles() {
-        const keys = this.btnsEntries.find(e => e[0] == 'color');
-
-        let childValues = this.btnsEntries.filter(e => ['backgroundHover', 'hover'].includes(e[0])).map(e =>{
-
-        });
-
-        return {
-            childValues: [
-                {
-                    id: ':hover>i:before', values: [
-                        ['color', 'green']
-                    ]
-                }
-            ]
+        //let values = values.entries.filter(e => values)
+        const converter = (entry: [string, any]): IcGElementStyleObject => {
+            const val = styleDict[entry[0]]; return <IcGElementStyleObject>{
+                id: val.sel,
+                values: [[val.type, entry[1]]]
+            };
         };
-    }
 
-    private get ChevronColor(): IcGElementStyleObject | undefined {
-        const key = this.btnsEntries.find(e => e[0] == 'color');
-        return key ? <IcGElementStyleObject>{
-            childValues: [{
-                id: ':before', values: [
-                    [key[0], key[1]]
-                ]
-            }]
-        } : undefined;
-    }
+        let t = values.entries.filter(e => values.container!.includes(e[0])).map(converter)
+            .map(e => e.values);
 
-    // color?: string;
-    // hover?: string;
-    // background?: string;
-    // backgroundHover?: string;
-
-    private get BtnBackground() {
-        const key = this.btnsEntries.find(e => e[0] == 'color');
-        return key ? <IcGElementStyleObject>{
-            childValues: [{
-                id: ':before', values: [
-                    [key[0], key[1]]
-                ]
-            }]
-        } : undefined;
+        return <IcGElementStyleObject>{
+            values: values.container && values.container.length > 0 ? values.entries.filter(e => values.container!.includes(e[0])).map(converter)
+                .map(e => e.values)[0] : undefined,
+            childValues: values.childs && values.childs.length > 0 ? values.entries.filter(e => values.childs!.includes(e[0])).map(converter) : undefined
+        };
     }
 
     public togglePlay() {
@@ -205,11 +204,11 @@ export class Carousel {
 
         _PLATFORM.global.clearInterval(this.intervalTimer);
         this.intervalTimer = global.setInterval(() => {
-            if (!this.gallery.options!.carousel!.autoplay_repeat && this.activeIndex! == this.gallery.media.length - 1)
+            if (!this.gallery.options!.Carousel!.autoplay_repeat && this.activeIndex! == this.gallery.media.length - 1)
                 _PLATFORM.global.clearInterval(this.intervalTimer);
 
             this.cycle(1, true);
-        }, this.gallery.options!.carousel!.slideInterval!);
+        }, this.gallery.options!.Carousel!.slideInterval!);
 
         this.running = true;
     }
@@ -247,7 +246,7 @@ export class Carousel {
     }
 
     public set_interval(interval: number) {
-        this.gallery.options!.carousel!.slideInterval = interval;
+        this.gallery.options!.Carousel!.slideInterval = interval;
         this.restart();
     }
 
