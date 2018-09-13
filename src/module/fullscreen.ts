@@ -14,7 +14,9 @@ export class Fullscreen {
     private element?: CgElement;
     private carouselContainer?: CgElement;
     private options: Options;
+
     private titleElement?: CgElement;
+    private indicator?: CgElement;
 
     private overlayStyleClass?: string;
 
@@ -56,7 +58,7 @@ export class Fullscreen {
     }
 
     show(index: number) {
-        this.setMenubarFixed(this.gallery.options!.Fullscreen!.menuBarFixed!);
+        this.setMenubarFixed(this.gallery.options!.Fullscreen!.Menubar!.fixed!);
         if (index) this.carousel.set_active(index);
 
         _PLATFORM.overlay.show(this.element!.Element, this.overlayStyleClass);
@@ -80,11 +82,20 @@ export class Fullscreen {
 
     createMenuBar() {
         this.titleElement = new CgElement({
+            tagName: _HTML.Tags.p,
             classes: _CLASSNAMES.fullscreenMenuBarTitle, textContent: '',
             styles: this.options.Fullscreen!.color ? { values: [['color', this.options.Fullscreen!.color!]] } : undefined
         });
+        this.indicator = new CgElement({
+            tagName: _HTML.Tags.div,
+            classes: _CLASSNAMES.fullscreenMenuBarIndicator, textContent: '',
+            styles: this.options.Fullscreen!.color ? { values: [['color', this.options.Fullscreen!.color!]] } : undefined
+        });
         return new CgElement({
-            classes: _CLASSNAMES.fullscreenMenuBar, children: [
+            classes: _CLASSNAMES.fullscreenMenuBar, 
+            styles: this.options.Fullscreen!.Menubar!.background ? { values:[['background', this.options.Fullscreen!.Menubar!.background!]] } : undefined,
+            children: [
+                this.indicator,
                 this.titleElement,
                 {
                     tagName: _HTML.Tags.ul, classes: _CLASSNAMES.fullscreenMenuBarBtnGroup, children: [
@@ -137,6 +148,7 @@ export class Fullscreen {
 
     public setMediaInfo(media: IMedia, index: number, length: number) {
         console.log(`${index}/${length}`, media);
+        this.indicator!.Element.innerText = `${index} / ${length}`;
         this.titleElement!.Element.innerText = media.title == undefined ? '' : media.title;
     }
 

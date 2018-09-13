@@ -10,9 +10,8 @@ import { ICgElement } from '../interfaces';
 export function createElement(createObject: ICreateElementObject) {
     let element = typeof createObject.elementTagOrElement === 'string' ? _PLATFORM.DOM.createElement(createObject.elementTagOrElement) : createObject.elementTagOrElement;
     if (createObject.classes) element.className += `${createObject.classes}`;
-    //if (createObject.styles) element.setAttribute('style', createObject.styles);
     if (createObject.textContent) element.textContent = createObject.textContent;
-    if (createObject.attr && Array.isArray(createObject.attr)) createObject.attr.forEach(a => (<any>element)[a[0]] = a[1]);
+    if (createObject.attr && Array.isArray(createObject.attr)) createObject.attr.forEach(a => element.setAttribute(a[0], a[1]));
 
     return element;
 }
@@ -104,7 +103,8 @@ export class CgElement {
         if (this.children)
             this.children.forEach(child => {
                 child.dispose();
-                this.element.removeChild(child.element);
+                // if (child.element.parentElement == this.element)
+                //     this.element.removeChild(child.element);
             });
 
         if (!this.options.eventListeners || this.options.eventListeners.length <= 0) return;
@@ -112,7 +112,7 @@ export class CgElement {
         this.options.eventListeners!.forEach(el =>
             this.element.removeEventListener(el.action, <EventListenerOrEventListenerObject>el.handler));
 
-        if (this.parentElement) this.parentElement.removeChild(this.element);
+        if(this.options.removeOnDispose && this.parentElement) this.parentElement.removeChild(this.element);
     }
 
 }
@@ -176,4 +176,20 @@ export function Get_YoutubeImg(id: string, quality?: number) {
     else if (quality > resolutions.length - 1) quality = resolutions.length - 1;
 
     return `https://img.youtube.com/vi/${id}/${resolutions[quality]}default.jpg`
+}
+
+export function Load_Resource(element: HTMLElement) {
+    try {
+        if (_PLATFORM.DOM && _PLATFORM.DOM.head)
+            _PLATFORM.DOM.head.appendChild(element);
+        return element;
+    } catch (e) {
+        //console.error('Couldnt load resource', element);
+        return undefined;
+    }
+    //let script = createElement({ elementTagOrElement: 'script', attr: [['src', uri]] });
+    //let script = _PLATFORM.DOM.createElement('script') as HTMLScriptElement;
+    //script.src = 'https://www.youtube.com/player_api'
+
+    //Find_Element(_PLATFORM.DOM, 'script')
 }

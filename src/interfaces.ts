@@ -4,9 +4,10 @@ import { CgElement } from "./dom/utils";
 
 export interface ICreateElementObject {
     elementTagOrElement: string | HTMLElement;
-    classes: string;
+    classes?: string;
     textContent?: string;
     attr?: string[][];
+    //src?: string;
     //styles?: string;
 }
 
@@ -34,6 +35,7 @@ export interface ICgElement {
     children?: (CgElement | ICgElement | undefined)[];
     eventListeners?: InyGalleryEventListener[];
     attr?: string[][];
+    removeOnDispose?: boolean;
 }
 
 export interface InyGalleryEventListener {
@@ -123,10 +125,27 @@ export interface fullscreenOptions {
     background?: string;
     color?: string;
     opacity?: number;
-    menuBarFixed?: boolean;
+    //menuBarFixed?: boolean;
     Events?: FullscreenEvents;
     Carousel?: CarouselOptions;
     btns?: btnOptions;
+    //text?: textOptions;
+    Menubar?: menubarOptions;
+    title?: IElementCssOptions;
+    description?: IElementCssOptions;
+}
+
+export interface IElementCssOptions {
+    color?: string;
+    background?: string;
+}
+
+export interface menubarOptions {
+    fixed?: boolean;
+    background?: string;
+    indicator?: boolean | [string, string?];
+    // title: string | string[];
+    // description: string | string[];
 }
 
 export interface CarouselEvents {
@@ -153,6 +172,7 @@ export interface IGallery {
 }
 
 export interface IMedia {
+    handler?: any;
     origin?: HTMLElement;
     element: HTMLElement;
     type?: string;

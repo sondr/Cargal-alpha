@@ -252,6 +252,9 @@ export class Carousel {
 
     public dispose() {
         //this.buttons.forEach(btnElement => btnElement.dispose());
+        this.stop();
+        if(this.thumbnails)
+            this.thumbnails!.dispose();
         if (this.element)
             this.element.dispose();
     }

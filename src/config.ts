@@ -1,5 +1,3 @@
-import { Carousel } from './module/carousel';
-import { ready } from './browser/document';
 import { Config, fullscreenOptions, CarouselOptions } from './interfaces';
 import { Find_Element, deepObjectAssign } from './dom/utils';
 
@@ -27,12 +25,19 @@ export function Configure(userConfig?: Config): Config {
                 btns: {}
             },
             Fullscreen: {
-                menuBarFixed: true,
+                //menuBarFixed: true,
                 opacity: 0.95,
+                Menubar:{
+                    fixed: true,
+                    indicator: true
+                },
+                title:{},
+                description: {},
                 Carousel: {
                     autoplay: false,
                     autoplay_repeat: false,
-                    padding: '40px 0',
+                    //padding: '40px 0',
+                    padding: '0 0',
                     //backgroundColor: '#222',
                     slideInterval: 10000,
                     thumbnails: true,

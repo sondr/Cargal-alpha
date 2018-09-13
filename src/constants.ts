@@ -1,3 +1,7 @@
+export const _EXT_SCRIPTS = {
+    YT: 'https://www.youtube.com/player_api'
+}
+
 export const _CLASSNAMES = {
     active: 'active',
     hidden: 'cg-hidden',
@@ -21,6 +25,7 @@ export const _CLASSNAMES = {
     fullscreenContainer: 'cg-fs-container',
     fullscreenGallery: 'cg-fs-gallery',
     fullscreenMenuBar: 'cg-fs-menubar',
+    fullscreenMenuBarIndicator: 'cg-fs-menubar-indicator',
     fullscreenMenuBarTitle: 'cg-fs-menubar-title',
     fullscreenMenuBarBtnGroup: 'cg-fs-menubar-btn-group',
     fullscreenMenuBarBtn: 'cg-fs-menubar-btn',
@@ -32,6 +37,8 @@ export const _CLASSNAMES = {
     iconThumbnails: 'cg-thumbnails',
     iconTiles: 'cg-tiles',
     iconClose: 'cg-close',
+    iconPlay: 'cg-play',
+    iconPause: 'cg-paused',
     chevron: 'cg-chevron',
 
     left: 'cg-left',
@@ -48,7 +55,8 @@ export const _HTML = {
         img: 'img',
         ul: 'ul',
         li: 'li',
-        i: 'i'
+        i: 'i',
+        p: 'p'
     },
     Attr:{
         src: 'src',

@@ -30,15 +30,27 @@ $fullScreenTextColor: #fff;
         z-index: $zIndex + 2; 
         width: 100%;
         color: #{$fullScreenTextColor};
+        .cg-fs-menubar-indicator{
+            position: absolute;
+            top: 0;
+            left: 1%;
+            font-size: 1.2em;
+            line-height: 45px;
+            margin: 0;
+        }
         .cg-fs-menubar-title {
-            float: left;
-            font-size: 40px;
-            line-height: 64px;
+            //float: left;
+            text-align: center;
+            font-size: 1.2em;
+            line-height: 45px;
             color: #{$fullScreenTextColor};
             padding: 0 0 0 15px;
+            margin: 0;
         }
         ul.cg-fs-menubar-btn-group {
-            float: right;
+            position: absolute;
+            top:0.1%;
+            right: 0.1%;
             list-style-type: none;
             margin: 0;
             padding: 0;
@@ -99,7 +111,7 @@ $fullScreenTextColor: #fff;
                 //display: inline-block;
                 vertical-align: middle;
                 max-height: 100%;
-                width: auto;
+                max-width: 100%;
             }
             * {
                 display: inherit;
@@ -211,8 +223,8 @@ div.cg-overlay {
 .cg-close {
     position: relative;
     display: block;
-    width: 40px;
-    height: 40px; //100%;
+    width: 34px;
+    height: 34px; //100%;
     
     &:before,
     &:after {
@@ -220,8 +232,8 @@ div.cg-overlay {
         position: absolute;
         right: 50%;
         content: ' ';
-        height: 33px;
-        width: 2px;
+        height: 26px;
+        width: 1px;
     }
     &:before {
         transform: rotate(45deg);
@@ -250,11 +262,11 @@ div.cg-overlay {
 }
 
 .cg-thumbnails {
-    height: 28px;
-    width: 28px;
+    height: 22px;
+    width: 22px;
     display: inline-block;
     content: ' ';
-    border-bottom: solid #{$fullScreenTextColor} 2px;
+    border-bottom: solid #{$fullScreenTextColor} 1px;
 }
 
 .cg-chevron {
@@ -321,3 +333,28 @@ div.cg-overlay {
         position:absolute;
     }
 }
+
+.cg-play {
+    border: 0;
+    background: transparent;
+    box-sizing: border-box;
+    width: 0;
+    height: 74px;
+  
+    border-color: transparent transparent transparent #202020;
+    transition: 100ms all ease;
+    cursor: pointer;
+  
+    // play state
+    border-style: solid;
+    border-width: 37px 0 37px 60px;
+  
+    &.cg-paused {
+      border-style: double;
+      border-width: 0px 0 0px 60px;
+    }
+  
+    &:hover {
+      border-color: transparent transparent transparent #404040;
+    }
+  }

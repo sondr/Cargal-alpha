@@ -5,7 +5,7 @@ var testConfig = {
         container: '#test',
         options: {
             Carousel: {
-                autoplay: false,
+                autoplay: true,
                 btns: {
                     //color: '#ed1c24',
                     hover: '#ed1c24',
@@ -16,6 +16,9 @@ var testConfig = {
             Fullscreen: {
                 background: '#fff',
                 color: '#000',
+                Menubar:{
+                    background: 'rgba(255,255,255,0.5)'
+                },
                 Carousel: {
                     btns: {
                         color: '#ed1c24',
@@ -43,10 +46,10 @@ var testConfig = {
 document.addEventListener('DOMContentLoaded', fn, false);
 
 function fn() {
-    var gal = window.CarGal.init(testConfig);
+    window.cargal = window.CarGal.init(testConfig);
     console.log("OUTPUT FROM index.js demo:");
     console.log(testConfig);
-    console.log(gal);
+    console.log(window.cargal);
 }
 
 function polyfills() {

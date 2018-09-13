@@ -1,26 +1,37 @@
 import { _PLATFORM } from './../platform';
 import { dynCssVariables, IcGElementStyleObject } from '../interfaces';
+import { createElement, Load_Resource } from './utils';
 
 const prependText: string = "cg-dyn";
 
 export class DynamicStyle {
+    private disposed: boolean;
     public counter: number = 1;
     public styleSheet?: HTMLStyleElement;
     public variables: dynCssVariables[] = [];
     private attached: boolean = false;
 
     constructor() {
-        this.styleSheet = _PLATFORM.DOM.createElement('style') as HTMLStyleElement;
-        this.styleSheet.type = 'text/css';
-        this.styleSheet.setAttribute('rel', 'stylesheet');
+        this.styleSheet = createElement({
+            elementTagOrElement: 'style',
+            attr: [
+                ['type', 'text/css'],
+                ['rel', 'stylesheet']
+            ]
+        }) as HTMLStyleElement;
+        this.disposed = false;
+    }
+
+    public get isDisposed(){
+        return this.disposed;
     }
 
     public appendStyle(styles: IcGElementStyleObject): string | undefined {
-        if(!styles) return undefined;
+        if (!styles) return undefined;
         const name = prependText + this.counter++;
-        if(!styles.values) styles.values = [];
-        if(!styles.childValues) styles.childValues = [];
-        
+        if (!styles.values) styles.values = [];
+        if (!styles.childValues) styles.childValues = [];
+
         this.variables.push({
             id: name,
             value: styles.values.filter(s => s.length === 2).map(s => `${s[0]}:${s[1].replace(';', '') + '!important;'}`).join(' '),
@@ -58,13 +69,14 @@ export class DynamicStyle {
 
 
     attachStylesheet() {
-        if (_PLATFORM.DOM && _PLATFORM.DOM.head && this.styleSheet)
-            _PLATFORM.DOM.head.appendChild(this.styleSheet);
+        if (this.styleSheet)
+            this.attached = !!Load_Resource(this.styleSheet);
     }
 
     dispose() {
         if (this.styleSheet)
             _PLATFORM.DOM.head.removeChild(this.styleSheet);
         this.styleSheet = undefined;
+        this.disposed = true;
     }
 }

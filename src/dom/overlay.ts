@@ -3,19 +3,27 @@ import { _CLASSNAMES, _HTML, _EVENT_ACTIONS } from '../constants';
 import { CgElement } from './utils';
 
 export class Overlay {
+    private disposed: boolean;
     private element: CgElement;
     private initialClasses: string;
     private lastActiveElement?: HTMLElement;
 
     constructor() {
-        this.element = new CgElement({ classes: _CLASSNAMES.overlay });
+        this.element = new CgElement({ 
+            parentElement: _PLATFORM.container,
+            classes: _CLASSNAMES.overlay
+         });
         this.initialClasses = this.element.Element.className.substr(0);
-        console.log("initalClasses: ", this.initialClasses);
-        this.append_overlay();
+        //this.append_overlay();
+        this.disposed = false;
     }
 
     public get Container() {
         return this.element;
+    }
+
+    public get isDisposed(){
+        return this.disposed;
     }
 
     public show(fullscreenElement: HTMLElement, overlayClass?: string) {
@@ -42,23 +50,25 @@ export class Overlay {
     }
 
     public dispose() {
+        console.log("disposing OVERLATY");
         this.allow_scroll();
-        this.remove_childs();
-        this.remove_overlay();
+        //this.remove_childs();
+        //this.remove_overlay();
+        this.disposed = true;
     }
 
-    private remove_childs() {
-        while (this.element.Element!.firstChild)
-            this.element.Element!.removeChild(this.element.Element!.firstChild!);
-    }
+    // private remove_childs() {
+    //     while (this.element.Element!.firstChild)
+    //         this.element.Element!.removeChild(this.element.Element!.firstChild!);
+    // }
 
     private append_overlay() {
         _PLATFORM.container.appendChild(this.element.Element!);
     }
 
-    private remove_overlay() {
-        _PLATFORM.container.removeChild(this.element.Element!);
-    }
+    // private remove_overlay() {
+    //     _PLATFORM.container.removeChild(this.element.Element!);
+    // }
 
     private prevent_scroll() {
         _PLATFORM.DOM.body.classList.add(_CLASSNAMES.preventScroll);

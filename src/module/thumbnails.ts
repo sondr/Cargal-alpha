@@ -40,6 +40,7 @@ export class Thumbnails {
     init() {
 
         return new CgElement({
+            removeOnDispose: true,
             parentElement: this.carousel.Element!.Element,
             classes: `${_CLASSNAMES.thumbnailContainer} ${this.carousel.gallery.options!.Carousel!.thumbnails ? _CLASSNAMES.active : ''}`, children: [
                 // {

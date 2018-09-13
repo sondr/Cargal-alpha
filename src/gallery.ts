@@ -166,26 +166,45 @@ export class Gallery {
         //gallery.container.addEventListener('click', (event) => gallery.Carousel!.togglePlay());
         //gallery.container.addEventListener('click', (event) => gallery.Fullscreen!.show(event));
 
-        gallery.media.forEach((img, index) =>
-            img.element.addEventListener(_EVENT_ACTIONS.click, (event) =>
-                gallery.Fullscreen!.show(index)));
+        gallery.media.forEach((img, index) => {
+            img.handler = () => {
+                gallery.Fullscreen!.show(index);
+            };
+            img.element.addEventListener(_EVENT_ACTIONS.click, img.handler);
+        });
 
-        gallery.externalMedia.filter(img => img.origin).forEach((img, index) =>
-            img.origin!.addEventListener(_EVENT_ACTIONS.click, (event) => {
+        gallery.externalMedia.filter(img => img.origin).forEach((img, index) => {
+            img.handler = () => {
                 gallery.Fullscreen!.show(imgCount + index);
-            }));
+            };
+            img.origin!.addEventListener(_EVENT_ACTIONS.click, img.handler);
+
+
+            // img.origin!.addEventListener(_EVENT_ACTIONS.click, (event) => {
+            //     gallery.Fullscreen!.show(imgCount + index);
+            // });
+        });
     }
 
     private Detach_EventListeners(gallery: IGallery) {
         //gallery.container.removeEventListener('click', (event) => gallery.Carousel!.togglePlay());
     }
 
+    //clickEL()
+
     public dispose() {
+
+
         this.galleries.forEach(gallery => {
+            if (gallery.media) gallery.media.forEach(m => m.element.removeEventListener(_EVENT_ACTIONS.click, m.handler));
+            if (gallery.externalMedia) gallery.externalMedia.filter(e => e.origin)
+                .forEach(m => m.origin!.removeEventListener(_EVENT_ACTIONS.click, m.handler));
             if (gallery.Carousel) gallery.Carousel.dispose();
             if (gallery.Fullscreen) gallery.Fullscreen.dispose();
             _PLATFORM.overlay.dispose();
         });
+        this.galleries = [];
+        GalleryId = 1;
     }
 
 }

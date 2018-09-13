@@ -31,7 +31,10 @@ export class MenuBar {
         return new CgElement({
             classes: _CLASSNAMES.fullscreenMenuBar, children: [
                 {
-                    classes: _CLASSNAMES.fullscreenMenuBarTitle, textContent: ''
+                    classes: _CLASSNAMES.fullscreenMenuBarIndicator, textContent: 'test'
+                },
+                {
+                    tagName: _HTML.Tags.p, classes: _CLASSNAMES.fullscreenMenuBarTitle, textContent: ''
                 },
                 {
                     classes: _CLASSNAMES.fullscreenMenuBarBtnGroup, tagName: _HTML.Tags.ul, children: [

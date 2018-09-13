@@ -18,8 +18,11 @@ const testConfig: Config = {
                 }
             },
             Fullscreen: {
-                background: '#fff',
+                background: '#eee',
                 color: '#000',
+                Menubar:{
+                    background: 'rgba(255,255,255,0.5)'
+                },
                 Carousel: {
                     btns: {
                         color: '#ed1c24',
