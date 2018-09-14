@@ -1,3 +1,4 @@
+import { IMedia } from './interfaces';
 import { Carousel } from "./module/carousel";
 import { Fullscreen } from "./module/fullscreen";
 import { CgElement } from "./dom/utils";
@@ -62,7 +63,8 @@ export interface GalleryInstance {
     ContainerId?: string;
     container?: HTMLElement | string | null;
     options: Options;
-    externalMedia?: HTMLElement[];
+    media?: HTMLElement[] | IMedia[];
+    externalMedia?: HTMLElement[] | IMedia[];
 }
 
 export interface ConfigEvents {
@@ -176,8 +178,14 @@ export interface IMedia {
     origin?: HTMLElement;
     element: HTMLElement;
     type?: string;
-    title: string;
-    description: string;
+    title?: string;
+    description?: string;
+    sizes?: ISrcSet[];
+}
+
+export interface ISrcSet {
+    w: number;
+    src: string;
 }
 
 // export interface IMedia {

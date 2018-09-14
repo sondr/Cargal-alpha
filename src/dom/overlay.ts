@@ -52,18 +52,8 @@ export class Overlay {
     public dispose() {
         console.log("disposing OVERLATY");
         this.allow_scroll();
-        //this.remove_childs();
         //this.remove_overlay();
         this.disposed = true;
-    }
-
-    // private remove_childs() {
-    //     while (this.element.Element!.firstChild)
-    //         this.element.Element!.removeChild(this.element.Element!.firstChild!);
-    // }
-
-    private append_overlay() {
-        _PLATFORM.container.appendChild(this.element.Element!);
     }
 
     // private remove_overlay() {

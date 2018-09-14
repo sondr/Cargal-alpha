@@ -1,6 +1,6 @@
 import '../style.scss';
 
-import { Gallery } from './gallery';
+import { CarGal } from './car-gal';
 import { Config } from './interfaces';
 import { Configure } from './config';
 
@@ -52,7 +52,7 @@ const testConfig: Config = {
 // }
 
 export function init(config?: Config) {
-    return new Gallery(Configure(config));
+    return new CarGal(Configure(config));
 }
 
 //export default Gallery;

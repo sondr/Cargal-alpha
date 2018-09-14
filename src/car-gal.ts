@@ -7,7 +7,7 @@ import { IGallery, Config, IMedia, Options, GalleryInstance } from './interfaces
 
 let GalleryId: number = 1;
 
-export class Gallery {
+export class CarGal {
 
     private galleries: IGallery[] = [];
 
@@ -52,7 +52,7 @@ export class Gallery {
                 for (let i = extMedia.length - 1; i >= 0; i--) {
                     let externalId = extMedia[i].dataset[_DATA_SETS.external.include];
                     if (externalId != g.ContainerId) continue;
-                    g.externalMedia!.unshift(extMedia.splice(i, 1)[0]);
+                    (<HTMLElement[]>g.externalMedia!).unshift(extMedia.splice(i, 1)[0]);
                 }
             }
         });
@@ -127,7 +127,7 @@ export class Gallery {
                 media: instance.container ?
                     convertToMediaObjects(Array.from((<HTMLElement>instance.container).getElementsByClassName(_CLASSNAMES.item) || []) as HTMLElement[]) :
                     [],
-                externalMedia: convertToMediaObjects(instance.externalMedia!.map(media => {
+                externalMedia: convertToMediaObjects((<HTMLElement[]>instance.externalMedia!).map(media => {
                     const removeFromDom = !!media.dataset[_DATA_SETS.external.removeFromDOM];
                     let element = removeFromDom ? media : media.cloneNode(true) as HTMLElement;
                     if (element.classList.contains(_CLASSNAMES.item))
@@ -144,6 +144,8 @@ export class Gallery {
             };
 
             instance.instance = gallery;
+
+            console.log("Media Sizes: ", gallery.media.filter(m => m.sizes));
 
             return gallery;
         });
@@ -168,6 +170,7 @@ export class Gallery {
 
         gallery.media.forEach((img, index) => {
             img.handler = () => {
+                if (gallery.Carousel) gallery.Carousel.stop();
                 gallery.Fullscreen!.show(index);
             };
             img.element.addEventListener(_EVENT_ACTIONS.click, img.handler);
@@ -178,31 +181,25 @@ export class Gallery {
                 gallery.Fullscreen!.show(imgCount + index);
             };
             img.origin!.addEventListener(_EVENT_ACTIONS.click, img.handler);
-
-
-            // img.origin!.addEventListener(_EVENT_ACTIONS.click, (event) => {
-            //     gallery.Fullscreen!.show(imgCount + index);
-            // });
         });
     }
 
     private Detach_EventListeners(gallery: IGallery) {
-        //gallery.container.removeEventListener('click', (event) => gallery.Carousel!.togglePlay());
+        if (gallery.media) gallery.media
+            .forEach(m => m.element.removeEventListener(_EVENT_ACTIONS.click, m.handler));
+        if (gallery.externalMedia) gallery.externalMedia.filter(e => e.origin)
+            .forEach(m => m.origin!.removeEventListener(_EVENT_ACTIONS.click, m.handler));
     }
 
     //clickEL()
 
     public dispose() {
-
-
         this.galleries.forEach(gallery => {
-            if (gallery.media) gallery.media.forEach(m => m.element.removeEventListener(_EVENT_ACTIONS.click, m.handler));
-            if (gallery.externalMedia) gallery.externalMedia.filter(e => e.origin)
-                .forEach(m => m.origin!.removeEventListener(_EVENT_ACTIONS.click, m.handler));
+            this.Detach_EventListeners(gallery);
             if (gallery.Carousel) gallery.Carousel.dispose();
             if (gallery.Fullscreen) gallery.Fullscreen.dispose();
-            _PLATFORM.overlay.dispose();
         });
+        _PLATFORM.dispose();
         this.galleries = [];
         GalleryId = 1;
     }

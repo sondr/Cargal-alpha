@@ -1,5 +1,5 @@
 import { _DATA_SETS } from './../constants';
-import { IMedia, ICreateElementObject } from './../interfaces';
+import { IMedia, ICreateElementObject, ISrcSet } from './../interfaces';
 import { _PLATFORM } from './../platform';
 import { _HTML } from '../constants';
 import { ICgElement } from '../interfaces';
@@ -28,8 +28,26 @@ export function convertToMediaObject(element: HTMLElement | HTMLElement[]) {
         origin: origin,
         element: e,
         title: origin ? origin.dataset[_DATA_SETS.item.title] : e.dataset[_DATA_SETS.item.title],
-        description: origin ? origin.dataset[_DATA_SETS.item.description] : e.dataset[_DATA_SETS.item.description]
+        description: origin ? origin.dataset[_DATA_SETS.item.description] : e.dataset[_DATA_SETS.item.description],
+        sizes: Get_ImageSrcSet(Find_Element(e, _HTML.Tags.img) as HTMLImageElement)
     };
+}
+
+export function Get_ImageSrcSet(element: HTMLImageElement): ISrcSet[] | undefined {
+    let srcset: string;
+    if (!element || !(srcset = <string>element.dataset[_DATA_SETS.img.srcset])) return undefined;
+    try {
+        return srcset
+            .replace(/(?:\r\n|\r|\n)/g, ' ').replace(/ +(?= )/g, '').split(',')
+            .map(srcs => {
+                const splitted = srcs.trim().split(' ');
+                return { w: Number.parseInt(splitted[1]), src: splitted[0] };
+            }).sort(e => e.w);
+    } catch (e) {
+        //console.log(e);
+        return undefined;
+    }
+
 }
 
 export class CgElement {
@@ -99,10 +117,10 @@ export class CgElement {
         return new CgElement(<ICgElement>child);
     }
 
-    public dispose() {
+    public dispose(removeFromParent?: boolean) {
         if (this.children)
             this.children.forEach(child => {
-                child.dispose();
+                child.dispose(this.options.removeOnDispose);
                 // if (child.element.parentElement == this.element)
                 //     this.element.removeChild(child.element);
             });
@@ -112,7 +130,9 @@ export class CgElement {
         this.options.eventListeners!.forEach(el =>
             this.element.removeEventListener(el.action, <EventListenerOrEventListenerObject>el.handler));
 
-        if(this.options.removeOnDispose && this.parentElement) this.parentElement.removeChild(this.element);
+        console.log(this.options.removeOnDispose, this.element);
+
+        if ((removeFromParent === true || this.options.removeOnDispose) && this.parentElement) this.parentElement.removeChild(this.element);
     }
 
 }

@@ -1,6 +1,6 @@
 import { _CLASSNAMES, _EVENT_ACTIONS, _HTML, _TYPES } from './../constants';
 import { _PLATFORM } from './../platform';
-import { CgElement,Find_Element } from '../dom/utils';
+import { CgElement, Find_Element } from '../dom/utils';
 import { Carousel } from './carousel';
 import { ICgElement } from '../interfaces';
 
@@ -17,7 +17,7 @@ export class Thumbnails {
         this.model = this.init();
     }
 
-    public get isActive(){
+    public get isActive() {
         return this.active;
     }
 
@@ -32,7 +32,7 @@ export class Thumbnails {
     }
 
     public toggle() {
-        if(this.active) this.hide();
+        if (this.active) this.hide();
         else this.show();
         //this.model.Element.classList.toggle(_CLASSNAMES.active);
     }
@@ -66,17 +66,23 @@ export class Thumbnails {
     }
 
     create_thumbnails(): CgElement {
-        let thumbnailList: ICgElement = { tagName: _HTML.Tags.ul,
+        let thumbnailList: ICgElement = {
+            //removeOnDispose: true,
+            tagName: _HTML.Tags.ul,
             eventListeners: [
-                { action: _EVENT_ACTIONS.mouseDown, handler: e => { 
-                    e.preventDefault();
-                    console.log('mousedown', thumbnailList.element, e); } 
+                {
+                    action: _EVENT_ACTIONS.mouseDown, handler: e => {
+                        e.preventDefault();
+                        console.log('mousedown', thumbnailList.element, e);
+                    }
                 },
                 { action: _EVENT_ACTIONS.mouseUp, handler: e => { console.log('mouseup', thumbnailList.element, e); } },
-                { action: _EVENT_ACTIONS.touchStart, handler: e => { 
-                    thumbnailList.element!.style.overflowX = 'auto';
-                    console.log('touchmove', thumbnailList.element, e); 
-            } }
+                {
+                    action: _EVENT_ACTIONS.touchStart, handler: e => {
+                        thumbnailList.element!.style.overflowX = 'auto';
+                        console.log('touchmove', thumbnailList.element, e);
+                    }
+                }
             ],
             children: []
         };
@@ -96,12 +102,14 @@ export class Thumbnails {
                 }]
             });
         });
-        
+
         this.thumbnailList = new CgElement(thumbnailList);
         return this.thumbnailList;
     }
 
     public dispose() {
         if (this.model) this.model.dispose();
+        // const parentEl = this.model.Element.parentElement;
+        // if (parentEl) parentEl.removeChild(this.model.Element);
     }
 }

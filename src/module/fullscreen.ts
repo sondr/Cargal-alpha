@@ -58,6 +58,7 @@ export class Fullscreen {
     }
 
     show(index: number) {
+        console.log(`show index ${index}`);
         this.setMenubarFixed(this.gallery.options!.Fullscreen!.Menubar!.fixed!);
         if (index) this.carousel.set_active(index);
 

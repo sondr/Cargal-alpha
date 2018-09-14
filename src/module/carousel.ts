@@ -1,3 +1,4 @@
+import { IMedia } from './../interfaces';
 import { Fullscreen } from './fullscreen';
 import { CgElement, Find_Element } from './../dom/utils';
 import { _PLATFORM } from './../platform';
@@ -61,6 +62,10 @@ export class Carousel {
     public get getActiveIndex(): number {
         return this.activeIndex!;
     }
+
+//     public Add_Media(media: IMedia){
+// this.gallery.
+//     }
 
     private activateThumbnails() {
         if (!this.thumbnails) this.thumbnails = new Thumbnails(this);
@@ -142,6 +147,7 @@ export class Carousel {
 
         this.buttonContainer = {
             //classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.hidden}`,
+            removeOnDispose: true,
             classes: `${_CLASSNAMES.btnContainer}`,
             children: [
                 // LEFT CLICK
@@ -234,6 +240,7 @@ export class Carousel {
 
         if (index >= this.gallery.media.length) return;
         if (this.activeIndex != undefined) this.set_inactive(this.activeIndex);
+        console.log("Set Active: ", this.gallery.media[index]);
         this.gallery.media[index].element.classList.add(_CLASSNAMES.active);
 
         if (this.fullScreen)

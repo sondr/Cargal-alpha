@@ -102,5 +102,8 @@ export const _DATA_SETS = {
     external:{
         include: 'cgGalleryId',
         removeFromDOM: 'cgRemove'
+    },
+    img:{
+        srcset: 'cgSrcset'
     }
 };
