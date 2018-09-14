@@ -9,6 +9,7 @@ let GalleryId: number = 1;
 
 export class CarGal {
 
+    private eventListeners: { action: string, handler: any }[] = [];
     private galleries: IGallery[] = [];
 
     constructor(config: Config) {
@@ -164,6 +165,17 @@ export class CarGal {
     }
 
     private Attach_EventListeners(gallery: IGallery) {
+        this.eventListeners.push({
+            action: _EVENT_ACTIONS.resize, handler: (event: Event) => {
+                console.log(event);
+            }
+        });
+
+        this.eventListeners.forEach(el => {
+            _PLATFORM.global.addEventListener(el.action, el.handler);
+        });
+
+
         const imgCount = gallery.media.length;
         //gallery.container.addEventListener('click', (event) => gallery.Carousel!.togglePlay());
         //gallery.container.addEventListener('click', (event) => gallery.Fullscreen!.show(event));
@@ -185,6 +197,11 @@ export class CarGal {
     }
 
     private Detach_EventListeners(gallery: IGallery) {
+        this.eventListeners.forEach(el => {
+            _PLATFORM.global.removeEventListener(el.action, el.handler);
+        });
+        this.eventListeners = [];
+
         if (gallery.media) gallery.media
             .forEach(m => m.element.removeEventListener(_EVENT_ACTIONS.click, m.handler));
         if (gallery.externalMedia) gallery.externalMedia.filter(e => e.origin)
