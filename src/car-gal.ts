@@ -9,7 +9,7 @@ let GalleryId: number = 1;
 
 export class CarGal {
 
-    private eventListeners: { action: string, handler: any }[] = [];
+    private eventListeners: { action: string, handler: any, timeout?: number }[] = [];
     private galleries: IGallery[] = [];
 
     constructor(config: Config) {
@@ -165,11 +165,11 @@ export class CarGal {
     }
 
     private Attach_EventListeners(gallery: IGallery) {
-        this.eventListeners.push({
+        this.eventListeners = [{
             action: _EVENT_ACTIONS.resize, handler: (event: Event) => {
                 console.log(event);
             }
-        });
+        }];
 
         this.eventListeners.forEach(el => {
             _PLATFORM.global.addEventListener(el.action, el.handler);
