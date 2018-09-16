@@ -255,7 +255,6 @@ export class Carousel {
     }
 
     public set_active(index: number, continuePlay?: boolean) {
-        //console.log("setactive", this.fullScreen);
         if (!continuePlay && this.running) this.stop(); // stopping loop
 
         if (index >= this.gallery.media.length) return;

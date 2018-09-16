@@ -73,14 +73,18 @@ export class Thumbnails {
                 {
                     action: _EVENT_ACTIONS.mouseDown, handler: e => {
                         e.preventDefault();
-                        console.log('mousedown', thumbnailList.element, e);
+                        //console.log('mousedown', thumbnailList.element, e);
                     }
                 },
-                { action: _EVENT_ACTIONS.mouseUp, handler: e => { console.log('mouseup', thumbnailList.element, e); } },
+                {
+                    action: _EVENT_ACTIONS.mouseUp, handler: e => {
+                        //console.log('mouseup', thumbnailList.element, e);
+                    }
+                },
                 {
                     action: _EVENT_ACTIONS.touchStart, handler: e => {
                         thumbnailList.element!.style.overflowX = 'auto';
-                        console.log('touchmove', thumbnailList.element, e);
+                        //console.log('touchmove', thumbnailList.element, e);
                     }
                 }
             ],

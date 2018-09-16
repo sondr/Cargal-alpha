@@ -155,7 +155,7 @@ export class Fullscreen {
 
     public setMediaInfo(media: IMedia, index: number, length: number, carousel: Carousel) {
         if (!media.element) media.element = Find_Element(media.containerElement!, _HTML.Tags.img)!;
-        //console.log(`${index}/${length}`, media);
+
         this.indicator!.Element.innerText = `${index} / ${length}`;
         this.titleElement!.Element.innerText = media.title || '';
         //let descHeight: number | undefined;
@@ -167,9 +167,7 @@ export class Fullscreen {
         if (media.description && descHeight)
             carousel.CarouselElement!.Element.style.setProperty(pb, `${descHeight}px`, 'important');
         else
-            carousel.CarouselElement!.Element.style.removeProperty(pb)
-
-        //carousel.CarouselElement!.Element.style.paddingBottom = descHeight ? `${descHeight}px !important` : '';
+            carousel.CarouselElement!.Element.style.removeProperty(pb);
     }
 
 }
