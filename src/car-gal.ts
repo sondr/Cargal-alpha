@@ -2,14 +2,17 @@ import { Fullscreen } from './module/fullscreen';
 import { _CLASSNAMES, _EVENT_ACTIONS, _HTML, _TYPES, _DATA_SETS } from './constants';
 import { Carousel } from './module/carousel';
 import { PLATFORM, _PLATFORM } from './platform';
-import { createElement, convertToMediaObjects, Find_Element, deepObjectAssign } from './dom/utils';
+import { createElement, convertToMediaObjects, Find_Element, deepObjectAssign, ProgressiveImageLoad } from './dom/utils';
 import { IGallery, Config, IMedia, Options, GalleryInstance } from './interfaces';
 
 let GalleryId: number = 1;
 
+
+interface IEventListenerObject { action: string, handler: any, vars?: any };
+
 export class CarGal {
 
-    private eventListeners: { action: string, handler: any, timeout?: number }[] = [];
+    private eventListeners: IEventListenerObject[] = [];
     private galleries: IGallery[] = [];
 
     constructor(config: Config) {
@@ -91,8 +94,8 @@ export class CarGal {
 
         galleries.forEach(g => g.options = deepObjectAssign(JSON.parse(JSON.stringify(_PLATFORM.defaultOptions)), g.options));
 
-        console.log(galleries);
-        console.log(extMedia);
+        // console.log(galleries);
+        // console.log(extMedia);
 
         return galleries;
     }
@@ -146,7 +149,7 @@ export class CarGal {
 
             instance.instance = gallery;
 
-            console.log("Media Sizes: ", gallery.media.filter(m => m.sizes));
+            //console.log("Media Sizes: ", gallery.media.filter(m => m.sizes));
 
             return gallery;
         });
@@ -156,26 +159,47 @@ export class CarGal {
             if (gallery.options!.enableFullScreen || !gallery.container)
                 gallery.Fullscreen = new Fullscreen(gallery);
 
-            this.Attach_EventListeners(gallery);
+            this.Attach_Gallery_EventListeners(gallery);
 
         });
 
         //building dyamic stylesheet
         _PLATFORM.styleSheet.buildSheet();
+
+        this.Attach_Global_EventListeners();
     }
 
-    private Attach_EventListeners(gallery: IGallery) {
-        this.eventListeners = [{
-            action: _EVENT_ACTIONS.resize, handler: (event: Event) => {
-                console.log(event);
+    private Attach_Global_EventListeners() {
+        let resizeEvent: IEventListenerObject = {
+            action: _EVENT_ACTIONS.resize, vars: {}, handler: (event: Event) => {
+                _PLATFORM.global.clearTimeout(resizeEvent.vars!.timer);
+                resizeEvent.vars!.timer = _PLATFORM.global.setTimeout(() => {
+                    this.Update_GalleryImageSizes(event);
+                }, 150);
             }
-        }];
+        };
 
+        this.eventListeners = [resizeEvent];
         this.eventListeners.forEach(el => {
             _PLATFORM.global.addEventListener(el.action, el.handler);
         });
+    }
+
+    private Update_GalleryImageSizes(e: Event) {
+        // let media: IMedia[] = Array.prototype.concat(...this.galleries.map(g =>
+        //     [...(g.media || []), ...(g.externalMedia || []), ...((g.Fullscreen! || []).Media || [])]))
+        //     .filter((e: IMedia) => e.sizes);
+        // console.log(media);
+
+        this.galleries.forEach(g => {
+            [g.Carousel, (g.Fullscreen! || {}).Carousel].filter(e => e).forEach(c =>
+                ProgressiveImageLoad(c!.Media[c!.getActiveIndex]));
+        });
 
 
+    }
+
+    private Attach_Gallery_EventListeners(gallery: IGallery) {
         const imgCount = gallery.media.length;
         //gallery.container.addEventListener('click', (event) => gallery.Carousel!.togglePlay());
         //gallery.container.addEventListener('click', (event) => gallery.Fullscreen!.show(event));
@@ -185,7 +209,7 @@ export class CarGal {
                 if (gallery.Carousel) gallery.Carousel.stop();
                 gallery.Fullscreen!.show(index);
             };
-            img.element.addEventListener(_EVENT_ACTIONS.click, img.handler);
+            img.containerElement!.addEventListener(_EVENT_ACTIONS.click, img.handler);
         });
 
         gallery.externalMedia.filter(img => img.origin).forEach((img, index) => {
@@ -197,13 +221,8 @@ export class CarGal {
     }
 
     private Detach_EventListeners(gallery: IGallery) {
-        this.eventListeners.forEach(el => {
-            _PLATFORM.global.removeEventListener(el.action, el.handler);
-        });
-        this.eventListeners = [];
-
         if (gallery.media) gallery.media
-            .forEach(m => m.element.removeEventListener(_EVENT_ACTIONS.click, m.handler));
+            .forEach(m => m.containerElement.removeEventListener(_EVENT_ACTIONS.click, m.handler));
         if (gallery.externalMedia) gallery.externalMedia.filter(e => e.origin)
             .forEach(m => m.origin!.removeEventListener(_EVENT_ACTIONS.click, m.handler));
     }
@@ -211,6 +230,11 @@ export class CarGal {
     //clickEL()
 
     public dispose() {
+        this.eventListeners.forEach(el => {
+            _PLATFORM.global.removeEventListener(el.action, el.handler);
+        });
+        this.eventListeners = [];
+
         this.galleries.forEach(gallery => {
             this.Detach_EventListeners(gallery);
             if (gallery.Carousel) gallery.Carousel.dispose();

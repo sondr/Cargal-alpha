@@ -29,7 +29,7 @@ export class PLATFORM {
 
         this.overlay = new Overlay();
         this.styleSheet = new DynamicStyle();
-        console.log("Container", this.container);
+        //console.log("Container", this.container);
     }
 
     dispose() {

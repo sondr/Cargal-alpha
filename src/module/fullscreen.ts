@@ -1,6 +1,6 @@
 import { Media, ICgElement } from './../interfaces';
 import { _CLASSNAMES, _EVENT_ACTIONS, _TYPES, _HTML } from './../constants';
-import { CgElement, convertToMediaObjects, deepObjectAssign } from './../dom/utils';
+import { CgElement, convertToMediaObjects, deepObjectAssign, Find_Element } from './../dom/utils';
 //import { MenuBar } from './../dom/menu-bar';
 import { Carousel } from './carousel';
 import { _PLATFORM } from './../platform';
@@ -32,13 +32,12 @@ export class Fullscreen {
 
         this.images = this.gallery.media.concat(this.gallery.externalMedia).map(media => {
             return <IMedia>{
-                element: media.element.cloneNode(true),
-                type: media.type,
-                title: media.title,
-                description: media.description
+                ...media,
+                element: undefined,
+                containerElement: media.containerElement.cloneNode(true)
             };
         });
-        
+
         this.carousel = new Carousel(<IGallery>{
             media: this.images,
             container: this.element!.Element,
@@ -47,7 +46,15 @@ export class Fullscreen {
 
         if (this.options.Fullscreen!.background)
             this.overlayStyleClass = _PLATFORM.styleSheet.appendStyle({ values: [['background', this.options.Fullscreen!.background!]] });
-        console.log("overlayclass", this.overlayStyleClass, this.options.Fullscreen!.background);
+        //console.log("overlayclass", this.overlayStyleClass, this.options.Fullscreen!.background);
+    }
+
+    public get Carousel() {
+        return this.carousel;
+    }
+
+    public get Media() {
+        return this.images;
     }
 
     createContainerElements() {
@@ -58,11 +65,9 @@ export class Fullscreen {
     }
 
     show(index: number) {
-        console.log(`show index ${index}`);
         this.setMenubarFixed(this.gallery.options!.Fullscreen!.Menubar!.fixed!);
-        if (index) this.carousel.set_active(index);
-
         _PLATFORM.overlay.show(this.element!.Element, this.overlayStyleClass);
+        if (typeof index === _TYPES.number) this.carousel.set_active(index);
     }
 
     dispose() {
@@ -93,8 +98,8 @@ export class Fullscreen {
             styles: this.options.Fullscreen!.color ? { values: [['color', this.options.Fullscreen!.color!]] } : undefined
         });
         return new CgElement({
-            classes: _CLASSNAMES.fullscreenMenuBar, 
-            styles: this.options.Fullscreen!.Menubar!.background ? { values:[['background', this.options.Fullscreen!.Menubar!.background!]] } : undefined,
+            classes: _CLASSNAMES.fullscreenMenuBar,
+            styles: this.options.Fullscreen!.Menubar!.background ? { values: [['background', this.options.Fullscreen!.Menubar!.background!]] } : undefined,
             children: [
                 this.indicator,
                 this.titleElement,
@@ -138,19 +143,33 @@ export class Fullscreen {
     }
 
     setMenubarFixed(value: boolean) {
+        //let classList = this.menubar.Element.classList;
+        let classList = this.element!.Element.classList;
         if (value) {
-
-            this.menubar.Element.classList.add(_CLASSNAMES.fixed);
+            classList.add(_CLASSNAMES.fixed);
         }
         else {
-            this.menubar.Element.classList.remove(_CLASSNAMES.fixed);
+            classList.remove(_CLASSNAMES.fixed);
         }
     }
 
-    public setMediaInfo(media: IMedia, index: number, length: number) {
-        console.log(`${index}/${length}`, media);
+    public setMediaInfo(media: IMedia, index: number, length: number, carousel: Carousel) {
+        if (!media.element) media.element = Find_Element(media.containerElement!, _HTML.Tags.img)!;
+        //console.log(`${index}/${length}`, media);
         this.indicator!.Element.innerText = `${index} / ${length}`;
-        this.titleElement!.Element.innerText = media.title == undefined ? '' : media.title;
+        this.titleElement!.Element.innerText = media.title || '';
+        //let descHeight: number | undefined;
+
+        carousel.DescriptionElement.Element.innerText = media.description || '';
+        let descHeight = carousel.DescriptionElement.Element.clientHeight;
+
+        const pb = 'padding-bottom';
+        if (media.description && descHeight)
+            carousel.CarouselElement!.Element.style.setProperty(pb, `${descHeight}px`, 'important');
+        else
+            carousel.CarouselElement!.Element.style.removeProperty(pb)
+
+        //carousel.CarouselElement!.Element.style.paddingBottom = descHeight ? `${descHeight}px !important` : '';
     }
 
 }

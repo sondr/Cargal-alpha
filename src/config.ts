@@ -51,7 +51,7 @@ export function Configure(userConfig?: Config): Config {
     };
 
     cfg = deepObjectAssign({}, cfg, userConfig || {});
-    cfg.window = window;
+    if(window) cfg.window = window;
 
     //cfg.document = await ready(cfg.document);
     if (!cfg.document) cfg.document = document;

@@ -88,7 +88,7 @@ export class Thumbnails {
         };
 
         this.carousel.gallery.media.forEach((item, index) => {
-            let imgEl = Find_Element(item.element, _HTML.Tags.img) as HTMLImageElement;
+            let imgEl = Find_Element(item.containerElement, _HTML.Tags.img) as HTMLImageElement;
             if (!imgEl) return;
 
             thumbnailList.children!.push({

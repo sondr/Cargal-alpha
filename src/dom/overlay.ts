@@ -9,10 +9,10 @@ export class Overlay {
     private lastActiveElement?: HTMLElement;
 
     constructor() {
-        this.element = new CgElement({ 
+        this.element = new CgElement({
             parentElement: _PLATFORM.container,
             classes: _CLASSNAMES.overlay
-         });
+        });
         this.initialClasses = this.element.Element.className.substr(0);
         //this.append_overlay();
         this.disposed = false;
@@ -22,7 +22,7 @@ export class Overlay {
         return this.element;
     }
 
-    public get isDisposed(){
+    public get isDisposed() {
         return this.disposed;
     }
 
@@ -50,15 +50,16 @@ export class Overlay {
     }
 
     public dispose() {
-        console.log("disposing OVERLATY");
+        //console.log("disposing OVERLATY");
         this.allow_scroll();
-        //this.remove_overlay();
+        this.remove_overlay();
         this.disposed = true;
     }
 
-    // private remove_overlay() {
-    //     _PLATFORM.container.removeChild(this.element.Element!);
-    // }
+    private remove_overlay() {
+        if (this.element.Element && this.element.Element.parentElement == _PLATFORM.container)
+            _PLATFORM.container.removeChild(this.element.Element!);
+    }
 
     private prevent_scroll() {
         _PLATFORM.DOM.body.classList.add(_CLASSNAMES.preventScroll);

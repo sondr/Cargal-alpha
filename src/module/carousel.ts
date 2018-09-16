@@ -1,10 +1,9 @@
-import { IMedia } from './../interfaces';
+import { IMedia, IGallery, ICgElement, IcGElementStyleObject } from './../interfaces';
 import { Fullscreen } from './fullscreen';
-import { CgElement, Find_Element } from './../dom/utils';
+import { CgElement, Find_Element, ProgressiveImageLoad } from './../dom/utils';
 import { _PLATFORM } from './../platform';
 import { _CLASSNAMES, _EVENT_ACTIONS, _HTML } from './../constants';
 import { Thumbnails } from './thumbnails';
-import { IGallery, ICgElement, IcGElementStyleObject } from '../interfaces';
 
 interface IStyleDict {
     color: IStyleDictValues;
@@ -35,6 +34,8 @@ export class Carousel {
     private intervalTimer: any;
     private activeIndex?: number;
     private element?: CgElement;
+    private carouselElement?: CgElement;
+    private descriptionElement?: CgElement;
 
     private buttonContainer?: ICgElement;
     private btnsEntries: [string, any][];
@@ -43,7 +44,7 @@ export class Carousel {
         this.fullScreen = fullScreen!;
         this.gallery = gallery;
         this.btnsEntries = Object.entries(this.gallery.options!.Carousel!.btns!).filter(e => e[1]);
-        console.log("btnkeys: ", this.btnsEntries);
+        //console.log("btnkeys: ", this.btnsEntries);
         this.init();
 
         if (this.gallery.options!.Carousel!.thumbnails)
@@ -54,18 +55,30 @@ export class Carousel {
         return this.element;
     }
 
+    public get CarouselElement() {
+        return this.carouselElement!;
+    }
+
     public get Thumbnails() {
         this.activateThumbnails();
         return this.thumbnails;
+    }
+
+    public get Media() {
+        return this.gallery.media;
     }
 
     public get getActiveIndex(): number {
         return this.activeIndex!;
     }
 
-//     public Add_Media(media: IMedia){
-// this.gallery.
-//     }
+    public get DescriptionElement() {
+        return this.descriptionElement!;
+    }
+
+    //     public Add_Media(media: IMedia){
+    // this.gallery.
+    //     }
 
     private activateThumbnails() {
         if (!this.thumbnails) this.thumbnails = new Thumbnails(this);
@@ -79,6 +92,11 @@ export class Carousel {
 
         let lastTouchStartEvent: TouchEvent | null;
 
+        this.descriptionElement = new CgElement({
+            classes: _CLASSNAMES.description,
+            //styles: this.gallery.options!.Carousel!.color
+        });
+
         let container: ICgElement = {
             element: carouselElement!,
             styles: this.gallery.options!.Carousel!.padding ? { values: [['padding', this.gallery.options!.Carousel!.padding!]] } : undefined,
@@ -86,10 +104,11 @@ export class Carousel {
                 {
                     element: listelement!, tagName: _HTML.Tags.ul,
                     children: this.gallery.media.map(el => <ICgElement>{
-                        element: el.element
+                        element: el.containerElement
                     })
                 },
-                this.createButtons()
+                this.createButtons(),
+                this.descriptionElement
             ],
             eventListeners: [
                 {
@@ -97,7 +116,6 @@ export class Carousel {
                 },
                 {
                     action: _EVENT_ACTIONS.touchEnd, handler: event => {
-                        console.log(lastTouchStartEvent!.touches, (<TouchEvent>event).touches)
                         if (lastTouchStartEvent!.touches.length == 1) {
                             const distance = lastTouchStartEvent!.changedTouches[0].pageX - (<TouchEvent>event).changedTouches[0].pageX;
                             if (Math.abs(distance) > 75) this.cycle(distance > 0 ? 1 : -1);
@@ -128,11 +146,13 @@ export class Carousel {
         };
 
         this.element = new CgElement(container);
+        this.carouselElement = this.element.children!.find(e => e.Element.classList.contains(_CLASSNAMES.carousel));
+
 
         if (this.gallery.media.length <= 0) return;
 
 
-        this.activeIndex = this.gallery.media.findIndex(image => image.element.classList.contains(_CLASSNAMES.active));
+        this.activeIndex = this.gallery!.media!.findIndex(image => image.containerElement!.classList.contains(_CLASSNAMES.active));
         //if (this.activeIndex == -1)
         this.set_active(this.activeIndex == -1 ? 0 : this.activeIndex);
 
@@ -143,7 +163,6 @@ export class Carousel {
     createButtons() {
         let chevronColorStyles = this.MakeStylesObject({ entries: this.btnsEntries, childs: [styleDict.color.key] });
         let btnStyles = this.MakeStylesObject({ entries: this.btnsEntries, container: [styleDict.background.key], childs: [styleDict.backgroundHover.key, styleDict.hover.key] });
-        console.log("buttonStyles:", btnStyles);
 
         this.buttonContainer = {
             //classes: `${_CLASSNAMES.btnContainer} ${_CLASSNAMES.hidden}`,
@@ -177,7 +196,7 @@ export class Carousel {
 
     public MakeStylesObject(values: { entries: [string, any][], container?: string[], childs?: string[] }): IcGElementStyleObject | undefined {
         if (!values) return undefined;
-        console.log(values.container);
+
         values.container = values.container || [];
         values.childs = values.childs || [];
         if (values.container.length == 0 && values.childs.length == 0) return undefined;
@@ -236,15 +255,17 @@ export class Carousel {
     }
 
     public set_active(index: number, continuePlay?: boolean) {
+        //console.log("setactive", this.fullScreen);
         if (!continuePlay && this.running) this.stop(); // stopping loop
 
         if (index >= this.gallery.media.length) return;
         if (this.activeIndex != undefined) this.set_inactive(this.activeIndex);
-        console.log("Set Active: ", this.gallery.media[index]);
-        this.gallery.media[index].element.classList.add(_CLASSNAMES.active);
+
+        this.gallery.media[index].containerElement.classList.add(_CLASSNAMES.active);
+        ProgressiveImageLoad(this.gallery.media[index]);
 
         if (this.fullScreen)
-            this.fullScreen.setMediaInfo(this.gallery.media[index], index + 1, this.gallery.media.length);
+            this.fullScreen.setMediaInfo(this.gallery.media[index], index + 1, this.gallery.media.length, this);
 
         if (this.thumbnails)
             this.thumbnails.setActive(index, this.activeIndex);
@@ -260,7 +281,7 @@ export class Carousel {
     public dispose() {
         //this.buttons.forEach(btnElement => btnElement.dispose());
         this.stop();
-        if(this.thumbnails)
+        if (this.thumbnails)
             this.thumbnails!.dispose();
         if (this.element)
             this.element.dispose();
@@ -273,10 +294,10 @@ export class Carousel {
 
     private set_inactive(index: number) {
         if (index >= this.gallery.media.length || index < 0) return;
-        this.gallery.media[index].element.classList.remove(_CLASSNAMES.active);
+        this.gallery.media[index].containerElement.classList.remove(_CLASSNAMES.active);
     }
 
     private set_all_inactive() {
-        this.gallery.media.forEach(img => img.element.classList.remove(_CLASSNAMES.active));
+        this.gallery.media.forEach(img => img.containerElement.classList.remove(_CLASSNAMES.active));
     }
 }

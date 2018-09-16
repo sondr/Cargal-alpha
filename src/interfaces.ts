@@ -176,11 +176,13 @@ export interface IGallery {
 export interface IMedia {
     handler?: any;
     origin?: HTMLElement;
-    element: HTMLElement;
+    element?: HTMLElement;
+    containerElement: HTMLElement;
     type?: string;
     title?: string;
     description?: string;
     sizes?: ISrcSet[];
+    currentSizeIndex?: number;
 }
 
 export interface ISrcSet {

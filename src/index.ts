@@ -21,6 +21,7 @@ const testConfig: Config = {
                 background: '#eee',
                 color: '#000',
                 Menubar:{
+                    fixed: false,
                     background: 'rgba(255,255,255,0.5)'
                 },
                 Carousel: {

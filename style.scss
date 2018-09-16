@@ -1,8 +1,8 @@
 $zIndex: 2000;
 $thumbsSize: 70px;
+$menubarSize: 45px;
 $fullScreenBgColor: #000;
 $fullScreenTextColor: #fff;
-
 :root {
     --cg-fsbg-color: #{$fullScreenBgColor};
     --cg-fs-color: #{$fullScreenTextColor};
@@ -12,25 +12,35 @@ $fullScreenTextColor: #fff;
     display: none !important;
 }
 
-.fixed {
-    position: fixed;
-}
-
+// .fixed {
+//     position: fixed;
+// }
 .cg-fs-container {
     z-index: $zIndex + 1;
     height: 100%;
     width: 100%;
     margin: auto;
+    &.fixed {
+        .cg-carousel {
+            height: calc(100% - #{$menubarSize});
+        }
+        &.cg-thumbs-active {
+            .cg-carousel {
+                height: calc(100% - (#{$menubarSize} + #{$thumbsSize}));
+            }
+        }
+    }
     &.cg-thumbs-active {
         .cg-carousel {
             height: calc(100% - #{$thumbsSize});
         }
     }
     .cg-fs-menubar {
-        z-index: $zIndex + 2; 
+        z-index: $zIndex + 2;
+        height: #{$menubarSize};
         width: 100%;
         color: #{$fullScreenTextColor};
-        .cg-fs-menubar-indicator{
+        .cg-fs-menubar-indicator {
             position: absolute;
             top: 0;
             left: 1%;
@@ -49,15 +59,14 @@ $fullScreenTextColor: #fff;
         }
         ul.cg-fs-menubar-btn-group {
             position: absolute;
-            top:0.1%;
+            top: 0.1%;
             right: 0.1%;
             list-style-type: none;
             margin: 0;
             padding: 0;
             overflow: hidden;
-            text-align: center; 
-            vertical-align: middle; 
-
+            text-align: center;
+            vertical-align: middle;
             li.cg-fs-menubar-btn {
                 vertical-align: middle;
                 float: left;
@@ -125,21 +134,30 @@ $fullScreenTextColor: #fff;
             }
         }
     }
+    .cg-description {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        font-size: 1.2em;
+        text-align: center;
+        padding: 10px;
+    }
     .cg-btn-container {
         .cg-btn {
             position: absolute;
             width: 4em; //width: 100%;
-            height: 4em; 
-            top: calc(50% - 2em); 
+            height: 4em;
+            top: calc(50% - 2em);
             background: rgba(0, 0, 0, 0.3);
             border-radius: 100%;
             z-index: 2;
             cursor: pointer;
             &.cg-left {
-                left: 3px;
+                left: 1%;
             }
             &.cg-right {
-                right: 3px;
+                right: 1%;
             }
             &:hover {
                 background: rgba(0, 0, 0, 0.4);
@@ -225,7 +243,6 @@ div.cg-overlay {
     display: block;
     width: 34px;
     height: 34px; //100%;
-    
     &:before,
     &:after {
         background-color: #{$fullScreenTextColor};
@@ -248,9 +265,7 @@ div.cg-overlay {
     color: #{$fullScreenTextColor};
     width: 4px;
     height: 4px;
-    box-shadow: 0 -10px 0, -10px -10px 0, 10px -10px 0, 0 0 0 40px inset, 
-    -10px 0 0, 10px 0 0, 0 10px 0, 
-    -10px 10px 0, 10px 10px 0;
+    box-shadow: 0 -10px 0, -10px -10px 0, 10px -10px 0, 0 0 0 40px inset, -10px 0 0, 10px 0 0, 0 10px 0, -10px 10px 0, 10px 10px 0;
     margin: 15px 10px;
     &:before,
     &:after {
@@ -272,11 +287,9 @@ div.cg-overlay {
 .cg-chevron {
     width: 100%;
     height: 100%;
-
     &:hover {
         opacity: 1;
     }
-
     &::before {
         padding: 5px;
         border-style: solid;
@@ -291,21 +304,18 @@ div.cg-overlay {
         width: 0.5em;
         color: #fff;
     }
-
-    &.cg-right:before, &.cg-left:before{
+    &.cg-right:before,
+    &.cg-left:before {
         top: 1.25em;
     }
-
-    &.cg-right:before{
+    &.cg-right:before {
         right: 1.5em;
         transform: rotate(45deg);
     }
-
-    &.cg-left:before{
+    &.cg-left:before {
         left: 1.5em;
         transform: rotate(-135deg);
     }
-
     &.cg-bottom:before {
         top: 0;
         transform: rotate(135deg);
@@ -316,21 +326,20 @@ div.cg-overlay {
     display: none;
 }
 
-.video-responsive{
-    overflow:hidden;
-    padding-bottom:56.25%;
-    position:relative;
-    height:0;
-    width:100%;
-
-    iframe{
-        left:0;
-        top:0;
+.video-responsive {
+    overflow: hidden;
+    padding-bottom: 56.25%;
+    position: relative;
+    height: 0;
+    width: 100%;
+    iframe {
+        left: 0;
+        top: 0;
         bottom: 0;
         right: 0;
-        height:100%;
-        width:100%;
-        position:absolute;
+        height: 100%;
+        width: 100%;
+        position: absolute;
     }
 }
 
@@ -340,21 +349,16 @@ div.cg-overlay {
     box-sizing: border-box;
     width: 0;
     height: 74px;
-  
     border-color: transparent transparent transparent #202020;
     transition: 100ms all ease;
-    cursor: pointer;
-  
-    // play state
+    cursor: pointer; // play state
     border-style: solid;
     border-width: 37px 0 37px 60px;
-  
     &.cg-paused {
-      border-style: double;
-      border-width: 0px 0 0px 60px;
+        border-style: double;
+        border-width: 0px 0 0px 60px;
     }
-  
     &:hover {
-      border-color: transparent transparent transparent #404040;
+        border-color: transparent transparent transparent #404040;
     }
-  }
+}

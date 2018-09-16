@@ -7,7 +7,7 @@ export class MenuBar {
 
     constructor(container?: CgElement) {
         this.element = this.create_element();
-        console.log("menubar: 0", this.element);
+        //console.log("menubar: 0", this.element);
 
         if (container) container.appendChild(this.element);
     }

@@ -24,12 +24,14 @@ export function convertToMediaObject(element: HTMLElement | HTMLElement[]) {
     const origin = Array.isArray(element) ? (<HTMLElement[]>element)[1] : undefined;
     const e = origin ? (<HTMLElement[]>element)[0] : <HTMLElement>element;
     //console.log("Dataset: ", element.dataset);
+    const mediaElement = Find_Element(e, _HTML.Tags.img);
     return <IMedia>{
         origin: origin,
-        element: e,
+        containerElement: e,
+        element: mediaElement,
         title: origin ? origin.dataset[_DATA_SETS.item.title] : e.dataset[_DATA_SETS.item.title],
         description: origin ? origin.dataset[_DATA_SETS.item.description] : e.dataset[_DATA_SETS.item.description],
-        sizes: Get_ImageSrcSet(Find_Element(e, _HTML.Tags.img) as HTMLImageElement)
+        sizes: Get_ImageSrcSet(mediaElement as HTMLImageElement)
     };
 }
 
@@ -37,12 +39,13 @@ export function Get_ImageSrcSet(element: HTMLImageElement): ISrcSet[] | undefine
     let srcset: string;
     if (!element || !(srcset = <string>element.dataset[_DATA_SETS.img.srcset])) return undefined;
     try {
+        //element.rem
         return srcset
             .replace(/(?:\r\n|\r|\n)/g, ' ').replace(/ +(?= )/g, '').split(',')
             .map(srcs => {
                 const splitted = srcs.trim().split(' ');
                 return { w: Number.parseInt(splitted[1]), src: splitted[0] };
-            }).sort(e => e.w);
+            }).sort((a, b) => a.w - b.w);
     } catch (e) {
         //console.log(e);
         return undefined;
@@ -130,7 +133,7 @@ export class CgElement {
         this.options.eventListeners!.forEach(el =>
             this.element.removeEventListener(el.action, <EventListenerOrEventListenerObject>el.handler));
 
-        console.log(this.options.removeOnDispose, this.element);
+        //console.log(this.options.removeOnDispose, this.element);
 
         if ((removeFromParent === true || this.options.removeOnDispose) && this.parentElement) this.parentElement.removeChild(this.element);
     }
@@ -159,6 +162,25 @@ export function Find_Element(DOM: Document | HTMLElement, query: string) {
     } catch (err) { console.log(err); }
 
     return element;
+}
+
+export function ProgressiveImageLoad(media: IMedia) {
+    if (!media || !media.sizes) return;
+    // Make virtual cachce and check if img already there.
+
+    let containerSize: { w: number, h: number } = { w: media.containerElement.offsetWidth, h: media.containerElement.clientHeight };
+    const img = Find_Element(media.containerElement, _HTML.Tags.img) as HTMLImageElement;
+    let sizeIndex = media.sizes.findIndex(e => e.w >= containerSize.w);
+    if (sizeIndex === -1) media.sizes.length - 1;
+
+    if (media.currentSizeIndex && media.currentSizeIndex >= sizeIndex) return;
+
+    if (img && img.src != media.sizes[sizeIndex].src) {
+        media.currentSizeIndex = sizeIndex;
+        //_PLATFORM.global.setTimeout(() => {
+            img.src = media!.sizes![sizeIndex].src;
+        //}, 50);
+    }
 }
 
 

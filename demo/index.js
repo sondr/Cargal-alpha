@@ -17,6 +17,7 @@ var testConfig = {
                 background: '#fff',
                 color: '#000',
                 Menubar:{
+                    fixed: true,
                     background: 'rgba(255,255,255,0.5)'
                 },
                 Carousel: {
@@ -36,7 +37,7 @@ var testConfig = {
                 autoplay: false
             },
             Fullscreen: {
-                background: '#fff',
+                //background: '#fff',
                 //color: '#000'
             }
         }
