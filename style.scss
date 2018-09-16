@@ -4,7 +4,6 @@ $menubarSize: 45px;
 $fullScreenBgColor: #000;
 $fullScreenTextColor: #fff;
 $fontSize: 16;
-
 :root {
     --cg-fsbg-color: #{$fullScreenBgColor};
     --cg-fs-color: #{$fullScreenTextColor};
@@ -290,7 +289,10 @@ div.cg-overlay {
 .cg-chevron {
     width: 100%;
     height: 100%;
-
+    &::before,
+    &::after {
+        box-sizing: content-box;
+    }
     &:hover {
         opacity: 1;
     }
@@ -302,8 +304,7 @@ div.cg-overlay {
         display: inline-block;
         width: #{$fontSize * 0.75}px;
         height: #{$fontSize * 0.75}px;
-        position: absolute;
-        //top: 0.15em;
+        position: absolute; //top: 0.15em;
         transform: rotate(-45deg);
         vertical-align: top;
         color: #fff;
