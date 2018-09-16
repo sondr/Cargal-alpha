@@ -1,5 +1,5 @@
 /*!
- * car-gal.ts v0.3.0
+ * car-gal.ts v0.3.2
  * Copyright (c) 2018-2018 Sondre Tveit Erno
  * @license ISC
  */

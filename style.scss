@@ -3,6 +3,8 @@ $thumbsSize: 70px;
 $menubarSize: 45px;
 $fullScreenBgColor: #000;
 $fullScreenTextColor: #fff;
+$fontSize: 16;
+
 :root {
     --cg-fsbg-color: #{$fullScreenBgColor};
     --cg-fs-color: #{$fullScreenTextColor};
@@ -146,9 +148,9 @@ $fullScreenTextColor: #fff;
     .cg-btn-container {
         .cg-btn {
             position: absolute;
-            width: 4em; //width: 100%;
-            height: 4em;
-            top: calc(50% - 2em);
+            width: #{$fontSize * 4}px; //width: 100%;
+            height: #{$fontSize * 4}px;
+            top: calc(50% - #{$fontSize / 2}px);
             background: rgba(0, 0, 0, 0.3);
             border-radius: 100%;
             z-index: 2;
@@ -233,6 +235,7 @@ div.cg-overlay {
     flex-direction: column;
     z-index: $zIndex;
     background: #{$fullScreenBgColor}; // VARIABLE
+    font-size: #{$fontSize - 1}px;
     &.active {
         display: block;
     }
@@ -287,33 +290,34 @@ div.cg-overlay {
 .cg-chevron {
     width: 100%;
     height: 100%;
+
     &:hover {
         opacity: 1;
     }
     &::before {
         padding: 5px;
         border-style: solid;
-        border-width: 0.2em 0.2em 0 0;
+        border-width: #{$fontSize/4}px #{$fontSize/4}px 0 0;
         content: '';
         display: inline-block;
-        height: 0.5em;
+        width: #{$fontSize * 0.75}px;
+        height: #{$fontSize * 0.75}px;
         position: absolute;
-        top: 0.15em;
+        //top: 0.15em;
         transform: rotate(-45deg);
         vertical-align: top;
-        width: 0.5em;
         color: #fff;
     }
     &.cg-right:before,
     &.cg-left:before {
-        top: 1.25em;
+        top: #{$fontSize}px;
     }
     &.cg-right:before {
-        right: 1.5em;
+        right: #{$fontSize * 1.5}px;
         transform: rotate(45deg);
     }
     &.cg-left:before {
-        left: 1.5em;
+        left: #{$fontSize * 1.5}px;
         transform: rotate(-135deg);
     }
     &.cg-bottom:before {

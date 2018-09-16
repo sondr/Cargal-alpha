@@ -171,14 +171,13 @@ export function ProgressiveImageLoad(media: IMedia) {
     let containerSize: { w: number, h: number } = { w: media.containerElement.offsetWidth, h: media.containerElement.clientHeight };
     const img = Find_Element(media.containerElement, _HTML.Tags.img) as HTMLImageElement;
     let sizeIndex = media.sizes.findIndex(e => e.w >= containerSize.w);
-    if (sizeIndex === -1) media.sizes.length - 1;
+    if (sizeIndex === -1) sizeIndex = media.sizes.length - 1;
 
     if (media.currentSizeIndex && media.currentSizeIndex >= sizeIndex) return;
-
     if (img && img.src != media.sizes[sizeIndex].src) {
         media.currentSizeIndex = sizeIndex;
         //_PLATFORM.global.setTimeout(() => {
-            img.src = media!.sizes![sizeIndex].src;
+        img.src = media!.sizes![sizeIndex].src;
         //}, 50);
     }
 }
