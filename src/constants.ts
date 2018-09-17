@@ -72,7 +72,10 @@ export const _TYPES = {
 
 export const _EVENT_ACTIONS = {
     resize: 'resize',
+    popstate: 'popstate',
     click: 'click',
+    keydown: 'keydown',
+    keyup: 'keyup',
     mouseDown: 'mousedown',
     mouseUp: 'mouseup',
     mouseMove: 'mousemove',

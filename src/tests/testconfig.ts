@@ -43,5 +43,6 @@ const testConfig: Config = {
                 //color: '#000'
             }
         }
-    }]
+    }],defaultOptions:{
+    }
 };

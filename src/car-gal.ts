@@ -8,12 +8,13 @@ import { IGallery, Config, IMedia, Options, GalleryInstance } from './interfaces
 let GalleryId: number = 1;
 
 
-interface IEventListenerObject { action: string, handler: any, vars?: any };
+interface IEventListenerObject { action: string, handler: any, vars?: any, options?: any };
 
 export class CarGal {
 
     private eventListeners: IEventListenerObject[] = [];
     private galleries: IGallery[] = [];
+    private fullscreenGalleryindex?: number;
 
     constructor(config: Config) {
         PLATFORM.create(config.document, config.window, config.containerElement as HTMLElement, config.defaultOptions!);
@@ -154,12 +155,12 @@ export class CarGal {
             return gallery;
         });
 
-        this.galleries.forEach(gallery => {
+        this.galleries.forEach((gallery, index) => {
             if (gallery.container) gallery.Carousel = new Carousel(gallery);
             if (gallery.options!.enableFullScreen || !gallery.container)
                 gallery.Fullscreen = new Fullscreen(gallery);
 
-            this.Attach_Gallery_EventListeners(gallery);
+            this.Attach_Gallery_EventListeners(gallery, index);
 
         });
 
@@ -179,10 +180,44 @@ export class CarGal {
             }
         };
 
-        this.eventListeners = [resizeEvent];
+        let keyboardEvent: IEventListenerObject = {
+            action: _EVENT_ACTIONS.keyup, vars: {}, handler: (event: KeyboardEvent) => {
+                if (!_PLATFORM.overlay.isActive || typeof this.fullscreenGalleryindex !== _TYPES.number) return;
+                let cycle;
+                switch (event.keyCode) {
+                    case 8:
+                    case 27:
+                        _PLATFORM.overlay.close();
+                        break;
+                    case 37:
+                        cycle = -1;
+                        break;
+                    case 39:
+                        cycle = 1;
+                        break;
+                }
+                if (cycle) this.galleries[this.fullscreenGalleryindex!].Fullscreen!.Carousel!.cycle(cycle);
+            }
+        };
+
+        // let popstate: IEventListenerObject;
+        // if (((window || {}).history || {}).pushState)
+        //     popstate = {
+        //         action: _EVENT_ACTIONS.popstate, vars: {}, options: false, handler: (event: Event) => {
+        //             console.log("popstate pushed", event);
+        //             window.history.pushState(null, <any>null, window.location.pathname);
+        //             if (!_PLATFORM.overlay.isActive || typeof this.fullscreenGalleryindex !== _TYPES.number) return;
+        //             event.stopPropagation(); event.preventDefault();
+        //             _PLATFORM.overlay.close();
+        //         }
+        //     };
+
+        this.eventListeners = [resizeEvent, keyboardEvent];
         this.eventListeners.forEach(el => {
-            _PLATFORM.global.addEventListener(el.action, el.handler);
+            _PLATFORM.global.addEventListener(el.action, el.handler, el.options);
         });
+
+
     }
 
     private Update_GalleryImageSizes(e: Event) {
@@ -199,7 +234,7 @@ export class CarGal {
 
     }
 
-    private Attach_Gallery_EventListeners(gallery: IGallery) {
+    private Attach_Gallery_EventListeners(gallery: IGallery, galleryIndex: number) {
         const imgCount = gallery.media.length;
         //gallery.container.addEventListener('click', (event) => gallery.Carousel!.togglePlay());
         //gallery.container.addEventListener('click', (event) => gallery.Fullscreen!.show(event));
@@ -208,6 +243,7 @@ export class CarGal {
             img.handler = () => {
                 if (gallery.Carousel) gallery.Carousel.stop();
                 gallery.Fullscreen!.show(index);
+                this.fullscreenGalleryindex = galleryIndex;
             };
             img.containerElement!.addEventListener(_EVENT_ACTIONS.click, img.handler);
         });
@@ -215,6 +251,7 @@ export class CarGal {
         gallery.externalMedia.filter(img => img.origin).forEach((img, index) => {
             img.handler = () => {
                 gallery.Fullscreen!.show(imgCount + index);
+                this.fullscreenGalleryindex = galleryIndex;
             };
             img.origin!.addEventListener(_EVENT_ACTIONS.click, img.handler);
         });
@@ -231,7 +268,7 @@ export class CarGal {
 
     public dispose() {
         this.eventListeners.forEach(el => {
-            _PLATFORM.global.removeEventListener(el.action, el.handler);
+            _PLATFORM.global.removeEventListener(el.action, el.handler, el.options);
         });
         this.eventListeners = [];
 
