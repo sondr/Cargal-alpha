@@ -27,6 +27,7 @@ export function Configure(userConfig?: Config): Config {
             },
             Fullscreen: {
                 //menuBarFixed: true,
+                Events:{},
                 closeOnClick: true,
                 opacity: 0.95,
                 Menubar: {
