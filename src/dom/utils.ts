@@ -24,18 +24,18 @@ export function convertToMediaObject(element: HTMLElement | HTMLElement[]) {
     const origin = Array.isArray(element) ? (<HTMLElement[]>element)[1] : undefined;
     const e = origin ? (<HTMLElement[]>element)[0] : <HTMLElement>element;
     //console.log("Dataset: ", element.dataset);
-    const mediaElement = Find_Element(e, _HTML.Tags.img);
+    const mediaElement = findElement(e, _HTML.Tags.img);
     return <IMedia>{
         origin: origin,
         containerElement: e,
         element: mediaElement,
         title: origin ? origin.dataset[_DATA_SETS.item.title] : e.dataset[_DATA_SETS.item.title],
         description: origin ? origin.dataset[_DATA_SETS.item.description] : e.dataset[_DATA_SETS.item.description],
-        sizes: Get_ImageSrcSet(mediaElement as HTMLImageElement)
+        sizes: getImageSrcSet(mediaElement as HTMLImageElement)
     };
 }
 
-export function Get_ImageSrcSet(element: HTMLImageElement): ISrcSet[] | undefined {
+export function getImageSrcSet(element: HTMLImageElement): ISrcSet[] | undefined {
     let srcset: string;
     if (!element || !(srcset = <string>element.dataset[_DATA_SETS.img.srcset])) return undefined;
     try {
@@ -121,7 +121,7 @@ export class CgElement {
     }
 
     public dispose(removeFromParent?: boolean) {
-        if (this.children)
+        if (this.children && Array.isArray(this.children))
             this.children.forEach(child => {
                 child.dispose(this.options.removeOnDispose);
                 // if (child.element.parentElement == this.element)
@@ -140,7 +140,7 @@ export class CgElement {
 
 }
 
-export function Find_Element(DOM: Document | HTMLElement, query: string) {
+export function findElement(DOM: Document | HTMLElement, query: string) {
     let element: HTMLElement | null = null;
     query = query.trim();
     try {
@@ -164,12 +164,12 @@ export function Find_Element(DOM: Document | HTMLElement, query: string) {
     return element;
 }
 
-export function ProgressiveImageLoad(media: IMedia) {
+export function progressiveImageLoad(media: IMedia) {
     if (!media || !media.sizes) return;
     // Make virtual cachce and check if img already there.
 
     let containerSize: { w: number, h: number } = { w: media.containerElement.offsetWidth, h: media.containerElement.clientHeight };
-    const img = Find_Element(media.containerElement, _HTML.Tags.img) as HTMLImageElement;
+    const img = findElement(media.containerElement, _HTML.Tags.img) as HTMLImageElement;
     let sizeIndex = media.sizes.findIndex(e => e.w >= containerSize.w);
     if (sizeIndex === -1) sizeIndex = media.sizes.length - 1;
 
@@ -183,22 +183,23 @@ export function ProgressiveImageLoad(media: IMedia) {
 }
 
 
-export const deepObjectAssign = <T extends object = object>(target: T, ...sources: T[]): T => {
-    if (!sources.length) return target;
-    const source = sources.shift();
-    if (source === undefined) return target;
+export function deepObjectAssign<T>(o: { target: T, sources: T[], skipKeys?: string[] }): T {
+    if (!o.sources.length) return o.target;
+    const source = o.sources.shift();
+    if (source === undefined) return o.target;
 
-    if (isMergebleObject(target) && isMergebleObject(source)) {
+    if (isMergebleObject(o.target) && isMergebleObject(source)) {
         Object.keys(source).forEach((key: string) => {
+            if (o.skipKeys && o.skipKeys.includes(key)) return;
             if (isMergebleObject((<any>source)[key])) {
-                if (!(<any>target)[key]) (<any>target)[key] = {};
-                deepObjectAssign((<any>target)[key], (<any>source)[key]);
+                if (!(<any>o.target)[key]) (<any>o.target)[key] = {};
+                deepObjectAssign({ target: (<any>o.target)[key], sources: [(<any>source)[key]] });
             } else
-                (<any>target)[key] = (<any>source)[key];
+                (<any>o.target)[key] = (<any>source)[key];
         });
     }
 
-    return deepObjectAssign(target, ...sources);
+    return deepObjectAssign(o);
 };
 
 export function isObject(item: any): boolean {
@@ -210,7 +211,7 @@ export function isMergebleObject(item: any): boolean {
 };
 
 
-export function Get_YoutubeImg(id: string, quality?: number) {
+export function getYoutubeImg(id: string, quality?: number) {
     let resolutions = ['hq', 'sd', 'maxres'];
     if (typeof quality != 'number') quality = 1;
     else if (quality < 0) quality = 0;
@@ -219,7 +220,7 @@ export function Get_YoutubeImg(id: string, quality?: number) {
     return `https://img.youtube.com/vi/${id}/${resolutions[quality]}default.jpg`
 }
 
-export function Load_Resource(element: HTMLElement) {
+export function loadResource(element: HTMLElement) {
     try {
         if (_PLATFORM.DOM && _PLATFORM.DOM.head)
             _PLATFORM.DOM.head.appendChild(element);

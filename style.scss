@@ -4,10 +4,10 @@ $menubarSize: 45px;
 $fullScreenBgColor: #000;
 $fullScreenTextColor: #fff;
 $fontSize: 16;
-:root {
-    --cg-fsbg-color: #{$fullScreenBgColor};
-    --cg-fs-color: #{$fullScreenTextColor};
-}
+// :root {
+//     --cg-fsbg-color: #{$fullScreenBgColor};
+//     --cg-fs-color: #{$fullScreenTextColor};
+// }
 
 .hidden {
     display: none !important;

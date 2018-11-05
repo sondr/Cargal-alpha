@@ -2,10 +2,10 @@ import { Fullscreen } from './module/fullscreen';
 import { _CLASSNAMES, _EVENT_ACTIONS, _HTML, _TYPES, _DATA_SETS } from './constants';
 import { Carousel } from './module/carousel';
 import { PLATFORM, _PLATFORM } from './platform';
-import { createElement, convertToMediaObjects, Find_Element, deepObjectAssign, ProgressiveImageLoad } from './dom/utils';
+import { createElement, convertToMediaObjects, findElement, deepObjectAssign, progressiveImageLoad } from './dom/utils';
 import { IGallery, Config, IMedia, Options, GalleryInstance } from './interfaces';
 
-let GalleryId: number = 1;
+let galleryId: number = 1;
 
 
 interface IEventListenerObject { action: string, handler: any, vars?: any, options?: any };
@@ -17,20 +17,20 @@ export class CarGal {
     private fullscreenGalleryindex?: number;
 
     constructor(config: Config) {
-        PLATFORM.create(config.document, config.window, config.containerElement as HTMLElement, config.defaultOptions!);
-
-        let instances = this.find_galleries(config);
+        PLATFORM.create(config);
+//config.Events
+        let instances = this.findGalleries(config);
         this.setup(instances);
     }
 
-    private find_external_images() {
+    private findExternalImages() {
         return Array.from(_PLATFORM.DOM.getElementsByClassName(_CLASSNAMES.externalIncludeImage!) || []) as HTMLElement[];
     }
 
-    private find_galleries(config: Config) {
+    private findGalleries(config: Config) {
         const instanceOptionsExist = config.instances && Array.isArray(config.instances) && config.instances.length > 0;
 
-        let extMedia = this.find_external_images();
+        let extMedia = this.findExternalImages();
 
         let galleries: GalleryInstance[] = [];
         // options by javascript instances
@@ -38,8 +38,8 @@ export class CarGal {
         if (instanceOptionsExist) {
             galleries = config.instances!.map(instance => {
                 if (typeof instance.container === _TYPES.string) {
-                    instance.ContainerId = <string>instance.container;
-                    instance.container = Find_Element(_PLATFORM.DOM, (<string>instance.container));
+                    instance.containerId = <string>instance.container;
+                    instance.container = findElement(_PLATFORM.DOM, (<string>instance.container));
                 }
                 return instance;
             }).filter(e => e.container);
@@ -51,12 +51,12 @@ export class CarGal {
         // Attach ExternalMedia
         galleries.forEach(g => {
             g.externalMedia = [];
-            if ((<HTMLElement>g.container).id) g.ContainerId = (<HTMLElement>g.container).id;
+            if ((<HTMLElement>g.container).id) g.containerId = (<HTMLElement>g.container).id;
 
-            if (g.ContainerId) {
+            if (g.containerId) {
                 for (let i = extMedia.length - 1; i >= 0; i--) {
                     let externalId = extMedia[i].dataset[_DATA_SETS.external.include];
-                    if (externalId != g.ContainerId) continue;
+                    if (externalId != g.containerId) continue;
                     (<HTMLElement[]>g.externalMedia!).unshift(extMedia.splice(i, 1)[0]);
                 }
             }
@@ -79,7 +79,7 @@ export class CarGal {
 
             if (instanceOptionsExist)
                 groupedById.forEach(group => {
-                    let opts = config.instances!.find(e => e.ContainerId == `#${group.key}`);
+                    let opts = config.instances!.find(e => e.containerId == `#${group.key}`);
                     if (opts)
                         group.options = opts.options;
                 });
@@ -87,13 +87,13 @@ export class CarGal {
 
             if (groupedById.length > 0)
                 Array.prototype.push.apply(galleries, groupedById.map(group => <GalleryInstance>{
-                    ContainerId: group.key,
+                    containerId: group.key,
                     externalMedia: group.media,
                     options: group.options
                 }));
         }
 
-        galleries.forEach(g => g.options = deepObjectAssign(JSON.parse(JSON.stringify(_PLATFORM.defaultOptions)), g.options));
+        galleries.forEach(g => g.options = deepObjectAssign({ target: _PLATFORM.defaultOptions, sources: [g.options] }));
 
         // console.log(galleries);
         // console.log(extMedia);
@@ -126,7 +126,7 @@ export class CarGal {
 
         this.galleries = instances.map(instance => {
             let gallery: IGallery = {
-                Id: GalleryId++,
+                id: galleryId++,
                 options: instance.options,
                 container: <HTMLElement>instance.container,
                 media: instance.container ?
@@ -160,22 +160,24 @@ export class CarGal {
             if (gallery.options!.enableFullScreen || !gallery.container)
                 gallery.Fullscreen = new Fullscreen(gallery);
 
-            this.Attach_Gallery_EventListeners(gallery, index);
+            this.attachGalleryEventListeners(gallery, index);
 
         });
 
         //building dyamic stylesheet
         _PLATFORM.styleSheet.buildSheet();
 
-        this.Attach_Global_EventListeners();
+        this.attachGlobalEventListeners();
+
+        if(_PLATFORM.configEvents.onLoaded) _PLATFORM.configEvents.onLoaded();
     }
 
-    private Attach_Global_EventListeners() {
+    private attachGlobalEventListeners() {
         let resizeEvent: IEventListenerObject = {
             action: _EVENT_ACTIONS.resize, vars: {}, handler: (event: Event) => {
                 _PLATFORM.global.clearTimeout(resizeEvent.vars!.timer);
                 resizeEvent.vars!.timer = _PLATFORM.global.setTimeout(() => {
-                    this.Update_GalleryImageSizes(event);
+                    this.updateGalleryImageSizes(event);
                 }, 150);
             }
         };
@@ -187,7 +189,8 @@ export class CarGal {
                 switch (event.keyCode) {
                     case 8:
                     case 27:
-                        _PLATFORM.overlay.close();
+                        //_PLATFORM.overlay.close();
+                        this.galleries[this.fullscreenGalleryindex!].Fullscreen!.close();
                         break;
                     case 37:
                         cycle = -1;
@@ -220,7 +223,7 @@ export class CarGal {
 
     }
 
-    private Update_GalleryImageSizes(e: Event) {
+    private updateGalleryImageSizes(e: Event) {
         // let media: IMedia[] = Array.prototype.concat(...this.galleries.map(g =>
         //     [...(g.media || []), ...(g.externalMedia || []), ...((g.Fullscreen! || []).Media || [])]))
         //     .filter((e: IMedia) => e.sizes);
@@ -228,13 +231,13 @@ export class CarGal {
 
         this.galleries.forEach(g => {
             [g.Carousel, (g.Fullscreen! || {}).Carousel].filter(e => e).forEach(c =>
-                ProgressiveImageLoad(c!.Media[c!.getActiveIndex]));
+                progressiveImageLoad(c!.Media[c!.getActiveIndex]));
         });
 
 
     }
 
-    private Attach_Gallery_EventListeners(gallery: IGallery, galleryIndex: number) {
+    private attachGalleryEventListeners(gallery: IGallery, galleryIndex: number) {
         const imgCount = gallery.media.length;
         //gallery.container.addEventListener('click', (event) => gallery.Carousel!.togglePlay());
         //gallery.container.addEventListener('click', (event) => gallery.Fullscreen!.show(event));
@@ -257,7 +260,7 @@ export class CarGal {
         });
     }
 
-    private Detach_EventListeners(gallery: IGallery) {
+    private detachEventListeners(gallery: IGallery) {
         if (gallery.media) gallery.media
             .forEach(m => m.containerElement.removeEventListener(_EVENT_ACTIONS.click, m.handler));
         if (gallery.externalMedia) gallery.externalMedia.filter(e => e.origin)
@@ -273,13 +276,13 @@ export class CarGal {
         this.eventListeners = [];
 
         this.galleries.forEach(gallery => {
-            this.Detach_EventListeners(gallery);
+            this.detachEventListeners(gallery);
             if (gallery.Carousel) gallery.Carousel.dispose();
             if (gallery.Fullscreen) gallery.Fullscreen.dispose();
         });
         _PLATFORM.dispose();
         this.galleries = [];
-        GalleryId = 1;
+        galleryId = 1;
     }
 
 }

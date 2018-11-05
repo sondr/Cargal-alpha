@@ -1,6 +1,6 @@
 import { Media, ICgElement } from './../interfaces';
 import { _CLASSNAMES, _EVENT_ACTIONS, _TYPES, _HTML } from './../constants';
-import { CgElement, convertToMediaObjects, deepObjectAssign, Find_Element } from './../dom/utils';
+import { CgElement, convertToMediaObjects, deepObjectAssign, findElement } from './../dom/utils';
 //import { MenuBar } from './../dom/menu-bar';
 import { Carousel } from './carousel';
 import { _PLATFORM } from './../platform';
@@ -23,10 +23,10 @@ export class Fullscreen {
     constructor(gallery: IGallery) {
         this.gallery = gallery;
 
-        let opts = JSON.parse(JSON.stringify(this.gallery.options!)) as Options;
-        opts.Carousel = deepObjectAssign({}, opts.Fullscreen!.Carousel!);
+        // let opts = JSON.parse(JSON.stringify(this.gallery.options!)) as Options;
+        // opts.Carousel = deepObjectAssign({ target: {}, sources: [opts.Fullscreen!.Carousel!] });
 
-        this.options = opts;
+        this.options = { Carousel: gallery.options!.Fullscreen!.Carousel, Fullscreen: gallery.options!.Fullscreen };
         this.menubar = this.createMenuBar();
         this.createContainerElements();
 
@@ -41,12 +41,11 @@ export class Fullscreen {
         this.carousel = new Carousel(<IGallery>{
             media: this.images,
             container: this.element!.Element,
-            options: opts
+            options: this.options
         }, this);
 
         if (this.options.Fullscreen!.background)
             this.overlayStyleClass = _PLATFORM.styleSheet.appendStyle({ values: [['background', this.options.Fullscreen!.background!]] });
-        //console.log("overlayclass", this.overlayStyleClass, this.options.Fullscreen!.background);
     }
 
     public get Carousel() {
@@ -59,15 +58,23 @@ export class Fullscreen {
 
     createContainerElements() {
         this.carouselContainer = new CgElement({ classes: _CLASSNAMES.carousel });
-        this.element = new CgElement({ classes: `${_CLASSNAMES.fullscreenContainer} ${this.options.Carousel!.thumbnails ? _CLASSNAMES.thumbsActive : ''}` });
+        this.element = new CgElement({
+            classes: `${_CLASSNAMES.fullscreenContainer} ${this.options.Carousel!.thumbnails ? _CLASSNAMES.thumbsActive : ''}`
+        });
         this.element.appendChild(this.menubar);
         this.element.appendChild(this.carouselContainer);
     }
 
     show(index: number) {
+        if(this.options.Fullscreen!.Events!.onShow) this.options.Fullscreen!.Events!.onShow();
         this.setMenubarFixed(this.gallery.options!.Fullscreen!.Menubar!.fixed!);
         _PLATFORM.overlay.show(this.element!.Element, this.overlayStyleClass);
         if (typeof index === _TYPES.number) this.carousel.set_active(index);
+    }
+
+    close(){
+        if(this.options.Fullscreen!.Events!.onClose) this.options.Fullscreen!.Events!.onClose();
+        _PLATFORM.overlay.close();
     }
 
     dispose() {
@@ -104,7 +111,8 @@ export class Fullscreen {
                 this.indicator,
                 this.titleElement,
                 {
-                    tagName: _HTML.Tags.ul, classes: _CLASSNAMES.fullscreenMenuBarBtnGroup, children: [
+                    tagName: _HTML.Tags.ul, classes: _CLASSNAMES.fullscreenMenuBarBtnGroup,
+                    children: [
                         // BUTTONS:
                         // {
                         //     tagName: _HTML.Tags.li, classes: _CLASSNAMES.fullscreenMenuBarBtn, eventListeners: [{
@@ -124,7 +132,8 @@ export class Fullscreen {
                         },
                         {
                             tagName: _HTML.Tags.li, classes: _CLASSNAMES.fullscreenMenuBarBtn, eventListeners: [{
-                                action: _EVENT_ACTIONS.click, handler: (event) => { _PLATFORM.overlay.close(); }
+                                //action: _EVENT_ACTIONS.click, handler: (event) => { _PLATFORM.overlay.close(); 
+                                action: _EVENT_ACTIONS.click, handler: () => this.close ()
                             }], children: [{
                                 tagName: _HTML.Tags.i, classes: _CLASSNAMES.iconClose,
                                 styles: this.options.Fullscreen!.color ? {
@@ -154,7 +163,7 @@ export class Fullscreen {
     }
 
     public setMediaInfo(media: IMedia, index: number, length: number, carousel: Carousel) {
-        if (!media.element) media.element = Find_Element(media.containerElement!, _HTML.Tags.img)!;
+        if (!media.element) media.element = findElement(media.containerElement!, _HTML.Tags.img)!;
 
         this.indicator!.Element.innerText = `${index} / ${length}`;
         this.titleElement!.Element.innerText = media.title || '';

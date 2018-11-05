@@ -1,5 +1,5 @@
 import { Config, fullscreenOptions, CarouselOptions } from './interfaces';
-import { Find_Element, deepObjectAssign } from './dom/utils';
+import { findElement, deepObjectAssign } from './dom/utils';
 
 //export async function Configure(userConfig?: Config): Promise<Config> {
 export function Configure(userConfig?: Config): Config {
@@ -11,37 +11,39 @@ export function Configure(userConfig?: Config): Config {
     let cfg: Config = {
         //window: window!,
         autoInit: true,
+        Events: {},
         defaultOptions: {
             lazyLoad: true,
             enableFullScreen: true,
             Carousel: {
                 autoplay: true,
-                autoplay_repeat: true,
+                autoplayRepeat: true,
                 backgroundColor: '#FFFFFF',
                 //opacity: undefined,
                 slideInterval: 10000,
                 thumbnails: true,
-                Events: undefined,
-                btns: {}
+                Events: {},
+                btns: {},
             },
             Fullscreen: {
                 //menuBarFixed: true,
+                closeOnClick: true,
                 opacity: 0.95,
-                Menubar:{
+                Menubar: {
                     fixed: true,
                     indicator: true
                 },
-                title:{},
+                title: {},
                 description: {},
                 Carousel: {
                     autoplay: false,
-                    autoplay_repeat: false,
+                    autoplayRepeat: false,
                     //padding: '40px 0',
                     padding: '0 0',
                     //backgroundColor: '#222',
                     slideInterval: 10000,
                     thumbnails: true,
-                    Events: undefined,
+                    Events: {},
                     btns: {}
                 },
                 btns: {}
@@ -50,14 +52,14 @@ export function Configure(userConfig?: Config): Config {
         instances: []
     };
 
-    cfg = deepObjectAssign({}, cfg, userConfig || {});
-    if(window) cfg.window = window;
+    cfg = deepObjectAssign({ target: {}, sources: [cfg, userConfig || {}] }); //, skipKeys:['Events'] });
+    if (window && !cfg.window) cfg.window = window;
 
     //cfg.document = await ready(cfg.document);
     if (!cfg.document) cfg.document = document;
 
     if (cfg.rootElement && typeof cfg.rootElement === 'string')
-        cfg.rootElement = Find_Element(cfg.document, cfg.rootElement);
+        cfg.rootElement = findElement(cfg.document, cfg.rootElement);
     if (!cfg.containerElement) cfg.containerElement = cfg.document.body;
 
     return cfg;

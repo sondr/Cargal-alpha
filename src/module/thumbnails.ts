@@ -1,6 +1,6 @@
 import { _CLASSNAMES, _EVENT_ACTIONS, _HTML, _TYPES } from './../constants';
 import { _PLATFORM } from './../platform';
-import { CgElement, Find_Element } from '../dom/utils';
+import { CgElement, findElement } from '../dom/utils';
 import { Carousel } from './carousel';
 import { ICgElement } from '../interfaces';
 
@@ -92,7 +92,7 @@ export class Thumbnails {
         };
 
         this.carousel.gallery.media.forEach((item, index) => {
-            let imgEl = Find_Element(item.containerElement, _HTML.Tags.img) as HTMLImageElement;
+            let imgEl = findElement(item.containerElement, _HTML.Tags.img) as HTMLImageElement;
             if (!imgEl) return;
 
             thumbnailList.children!.push({

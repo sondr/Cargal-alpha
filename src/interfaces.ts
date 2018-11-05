@@ -60,7 +60,7 @@ export interface Config {
 
 export interface GalleryInstance {
     instance?: IGallery;
-    ContainerId?: string;
+    containerId?: string;
     container?: HTMLElement | string | null;
     options: Options;
     media?: HTMLElement[] | IMedia[];
@@ -68,11 +68,11 @@ export interface GalleryInstance {
 }
 
 export interface ConfigEvents {
-    onLoaded: () => IGallery;
+    onLoaded?: () => void;
 }
 
 export interface Options {
-    Id?: string;
+    id?: string;
     enableFullScreen?: boolean;
     //autoInitiate?: boolean;
 
@@ -95,7 +95,7 @@ export interface Media {
 
 export interface CarouselOptions {
     autoplay?: boolean;
-    autoplay_repeat?: boolean;
+    autoplayRepeat?: boolean;
     slideInterval?: number;
 
     thumbnails?: boolean;
@@ -124,6 +124,7 @@ export interface btnOptions {
 }
 
 export interface fullscreenOptions {
+    closeOnClick?: boolean;
     background?: string;
     color?: string;
     opacity?: number;
@@ -152,18 +153,22 @@ export interface menubarOptions {
 
 export interface CarouselEvents {
     onEnd?: any;
-    onChange?: any;
+    onCycle?: any;
+    onNext?: any;
+    onPrev?: any;
     onStop?: any;
     onStart?: any;
+    onClick?: any;
 }
 
 export interface FullscreenEvents extends CarouselEvents {
     onShow?: any;
     onClose?: any;
+    //onClick?: any;
 }
 
 export interface IGallery {
-    Id: number;
+    id: number;
     options?: Options;
     containerId?: string;
     container: HTMLElement;

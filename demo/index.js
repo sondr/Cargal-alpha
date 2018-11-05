@@ -11,9 +11,15 @@ var testConfig = {
                     hover: '#ed1c24',
                     background: '#ed1c24',
                     backgroundHover: '#fff'
+                },
+                Events:{
+                    onCycle:(index, element)=>{ console.log("Cycle Carousel", index, element); },
+                    onPrev:(index, element)=>{ console.log("Prev Carousel", index, element); },
+                    onNext:(index, element)=>{ console.log("Next Carousel", index, element); },
                 }
             },
             Fullscreen: {
+                closeOnClick: true,
                 background: '#fff',
                 color: '#000',
                 Menubar:{
@@ -26,7 +32,16 @@ var testConfig = {
                         hover: '#fff',
                         background: '#fff',
                         backgroundHover: '#ed1c24'
+                    },
+                    Events:{
+                        onCycle:(index, element)=>{ console.log("Cycle Fullscreen", index, element); },
+                        onPrev:(index, element)=>{ console.log("Prev Fullscreen", index, element); },
+                        onNext:(index, element)=>{ console.log("Next Fullscreen", index, element); }
                     }
+                },
+                Events:{
+                    onShow:()=>{ console.log("ONSHOW FULLSCREEN CALL"); },
+                    onClose: () => { console.log("ONCLOSING EXTERNAL CALL"); }
                 }
             }
         }

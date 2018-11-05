@@ -1,6 +1,6 @@
 import { _PLATFORM } from './../platform';
 import { dynCssVariables, IcGElementStyleObject } from '../interfaces';
-import { createElement, Load_Resource } from './utils';
+import { createElement, loadResource } from './utils';
 
 const prependText: string = "cg-dyn";
 
@@ -70,12 +70,13 @@ export class DynamicStyle {
 
     attachStylesheet() {
         if (this.styleSheet)
-            this.attached = !!Load_Resource(this.styleSheet);
+            this.attached = !!loadResource(this.styleSheet);
     }
 
     dispose() {
-        if (this.styleSheet)
-            _PLATFORM.DOM.head.removeChild(this.styleSheet);
+        if (this.styleSheet && this.styleSheet.parentElement)
+            this.styleSheet.parentElement.removeChild(this.styleSheet);
+            //_PLATFORM.DOM.head.removeChild(this.styleSheet);
         this.styleSheet = undefined;
         this.disposed = true;
     }

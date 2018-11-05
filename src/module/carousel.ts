@@ -1,6 +1,6 @@
 import { IMedia, IGallery, ICgElement, IcGElementStyleObject } from './../interfaces';
 import { Fullscreen } from './fullscreen';
-import { CgElement, Find_Element, ProgressiveImageLoad } from './../dom/utils';
+import { CgElement, findElement, progressiveImageLoad } from './../dom/utils';
 import { _PLATFORM } from './../platform';
 import { _CLASSNAMES, _EVENT_ACTIONS, _HTML } from './../constants';
 import { Thumbnails } from './thumbnails';
@@ -44,7 +44,6 @@ export class Carousel {
         this.fullScreen = fullScreen!;
         this.gallery = gallery;
         this.btnsEntries = Object.entries(this.gallery.options!.Carousel!.btns!).filter(e => e[1]);
-        //console.log("btnkeys: ", this.btnsEntries);
         this.init();
 
         if (this.gallery.options!.Carousel!.thumbnails)
@@ -86,9 +85,9 @@ export class Carousel {
 
     private init() {
         let carouselElement = this.gallery.container.classList.contains(_CLASSNAMES.carousel) ?
-            this.gallery.container : Find_Element(this.gallery.container, `.${_CLASSNAMES.carousel}`); // or create one
+            this.gallery.container : findElement(this.gallery.container, `.${_CLASSNAMES.carousel}`); // or create one
 
-        let listelement = carouselElement ? Find_Element(carouselElement, _HTML.Tags.ul) : undefined;
+        let listelement = carouselElement ? findElement(carouselElement, _HTML.Tags.ul) : undefined;
 
         let lastTouchStartEvent: TouchEvent | null;
 
@@ -139,6 +138,15 @@ export class Carousel {
                     this.buttonContainer!.element!.classList.add(_CLASSNAMES.hidden);
                 }
             }]);
+        } else {
+            container.eventListeners = container.eventListeners!.concat([
+                {
+                    action: _EVENT_ACTIONS.click, handler: (event) => {
+                        if (this.gallery.options!.Fullscreen!.closeOnClick)
+                            this.fullScreen.close();
+                    }
+                }
+            ]);
         }
 
         container = {
@@ -172,7 +180,7 @@ export class Carousel {
                 // LEFT CLICK
                 {
                     classes: `${_CLASSNAMES.btn} ${_CLASSNAMES.left}`,
-                    eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(-1); } }],
+                    eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { e.stopPropagation(); this.cycle(-1); } }],
                     styles: btnStyles,
                     children: [{
                         tagName: _HTML.Tags.i, classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.left}`,
@@ -182,7 +190,7 @@ export class Carousel {
                 // RIGHT CLICK
                 {
                     classes: `${_CLASSNAMES.btn} ${_CLASSNAMES.right}`,
-                    eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { this.cycle(1); } }],
+                    eventListeners: [{ action: _EVENT_ACTIONS.click, handler: e => { e.stopPropagation(); this.cycle(1);  } }],
                     styles: btnStyles,
                     children: [{
                         tagName: _HTML.Tags.i, classes: `${_CLASSNAMES.chevron} ${_CLASSNAMES.right}`,
@@ -229,7 +237,7 @@ export class Carousel {
 
         _PLATFORM.global.clearInterval(this.intervalTimer);
         this.intervalTimer = global.setInterval(() => {
-            if (!this.gallery.options!.Carousel!.autoplay_repeat && this.activeIndex! == this.gallery.media.length - 1)
+            if (!this.gallery.options!.Carousel!.autoplayRepeat && this.activeIndex! == this.gallery.media.length - 1)
                 _PLATFORM.global.clearInterval(this.intervalTimer);
 
             this.cycle(1, true);
@@ -251,6 +259,11 @@ export class Carousel {
         if (index >= this.gallery.media.length) index -= this.gallery.media.length;
         if (index < 0) index += this.gallery.media.length;
 
+        //CALLBACKS
+        if(this.gallery.options!.Carousel!.Events!.onCycle)this.gallery.options!.Carousel!.Events!.onCycle(index, this.gallery.media[index].element);
+        if(this.gallery.options!.Carousel!.Events!.onPrev && count === -1) this.gallery.options!.Carousel!.Events!.onPrev(index, this.gallery.media[index].element);
+        if(this.gallery.options!.Carousel!.Events!.onNext && count === 1) this.gallery.options!.Carousel!.Events!.onNext(index, this.gallery.media[index].element);
+
         this.set_active(index, continuePlay);
     }
 
@@ -261,7 +274,7 @@ export class Carousel {
         if (this.activeIndex != undefined) this.set_inactive(this.activeIndex);
 
         this.gallery.media[index].containerElement.classList.add(_CLASSNAMES.active);
-        ProgressiveImageLoad(this.gallery.media[index]);
+        progressiveImageLoad(this.gallery.media[index]);
 
         if (this.fullScreen)
             this.fullScreen.setMediaInfo(this.gallery.media[index], index + 1, this.gallery.media.length, this);
