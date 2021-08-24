@@ -1,8 +1,12 @@
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
+//import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as path from 'path';
 import * as webpack from 'webpack';
 
+const ensureArray = (config) => config && (Array.isArray(config) ? config : [config]) || [];
+const when = (condition, config, negativeConfig) =>
+  condition ? ensureArray(config) : ensureArray(negativeConfig);
 
 let pkg = require('./package.json');
 let year = new Date().getFullYear();
@@ -16,10 +20,43 @@ const distDir = path.resolve(__dirname, 'dist');
 const demoDir = path.resolve(__dirname, 'demo');
 
 function configure(env: any, args: any): webpack.Configuration {
-  let styleLoaders: webpack.Loader[] = [
-    'css-loader?sourceMap&importLoaders=1',
-    'postcss-loader?sourceMap',
-    'sass-loader?sourceMap'
+  // let styleLoaders: webpack.Loader[] = [
+  //   'css-loader?sourceMap&importLoaders=1',
+  //   'postcss-loader?sourceMap',
+  //   'sass-loader?sourceMap'
+  // ];
+
+  let isProduction = (args.mode === 'production');
+
+  const cssRules = [
+    {
+      loader: 'css-loader',
+      options: {
+        esModule: false
+      }
+    },
+    {
+      loader: 'postcss-loader',
+      options: {
+        postcssOptions: {
+          plugins: [
+            'autoprefixer',
+            'cssnano'
+          ]
+        }
+      }
+    }
+  ];
+  
+  const sassRules = [
+    {
+      loader: "sass-loader",
+      options: {
+        sassOptions: {
+          includePaths: ['node_modules']
+        }
+      }
+    }
   ];
 
   let config: webpack.Configuration = {
@@ -46,10 +83,10 @@ function configure(env: any, args: any): webpack.Configuration {
         { test: /.tsx?$/, loader: 'ts-loader' },
         {
           test: /\.scss$/,
-          use: (args.mode === 'production') ? ExtractTextPlugin.extract({
-            fallback: 'style-loader',
-            use: styleLoaders
-          }) : ['style-loader', ...styleLoaders]
+          use: isProduction ? 
+          [{ loader: MiniCssExtractPlugin.loader }, ...cssRules, ...sassRules ] 
+          : 
+          ['style-loader', ...cssRules, ...sassRules]
         },
         {
           test: /\.(png|jpg|jpeg|gif|ico)$/,
@@ -64,19 +101,24 @@ function configure(env: any, args: any): webpack.Configuration {
           hash: true,
           template: 'demo/index.ejs',
           // favicon: 'assets/favicon.ico'
-      })
+      }),
+      ...when(isProduction, new MiniCssExtractPlugin({ // updated to match the naming conventions for the js files
+        filename: isProduction ? '[name].[contenthash].bundle.css' : '[name].[hash].bundle.css',
+        chunkFilename: isProduction ? '[name].[contenthash].chunk.css' : '[name].[hash].chunk.css'
+      }), null)
+
     ]
   };
 
-  switch (args.mode) {
-    case 'development':
-        config.devtool = 'inline-source-map';
-        break;
+  // switch (args.mode) {
+  //   case 'development':
+  //       config.devtool = 'inline-source-map';
+  //       break;
 
-    case 'production':
-        config.plugins!.push(<any>new ExtractTextPlugin('[name].css'));
-        break;
-}
+  //   case 'production':
+  //       config.plugins!.push(<any>new ExtractTextPlugin('[name].css'));
+  //       break;
+  //}
 
   return config;
 }

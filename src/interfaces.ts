@@ -1,4 +1,3 @@
-import { IMedia } from './interfaces';
 import { Carousel } from "./module/carousel";
 import { Fullscreen } from "./module/fullscreen";
 import { CgElement } from "./dom/utils";
