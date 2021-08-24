@@ -103,8 +103,8 @@ function configure(env: any, args: any): webpack.Configuration {
           // favicon: 'assets/favicon.ico'
       }),
       ...when(isProduction, new MiniCssExtractPlugin({ // updated to match the naming conventions for the js files
-        filename: isProduction ? '[name].[contenthash].bundle.css' : '[name].[hash].bundle.css',
-        chunkFilename: isProduction ? '[name].[contenthash].chunk.css' : '[name].[hash].chunk.css'
+        filename: isProduction ? '[name].css' : '[name].[hash].css',
+        chunkFilename: isProduction ? '[name].chunk.css' : '[name].[hash].chunk.css'
       }), null)
 
     ]
