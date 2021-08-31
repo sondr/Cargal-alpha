@@ -82,14 +82,16 @@ $fontSize: 16;
     }
 }
 
-.cg-container {}
+.cg-container {
+    height: 100%;
+}
 
 .cg-fs-container {}
 
 .cg-carousel {
     position: relative;
     width: 100%;
-    height: 100%;
+    height: calc(100% - #{$thumbsSize});
     box-sizing: border-box;
     ul {
         padding: 0;
